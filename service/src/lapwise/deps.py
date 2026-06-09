@@ -10,6 +10,7 @@ from fastapi import Depends, Request
 
 from lapwise.clients.openf1 import OpenF1Client
 from lapwise.services.drivers import DriverService
+from lapwise.services.position import PositionService
 from lapwise.services.sessions import SessionService
 
 
@@ -45,3 +46,10 @@ def get_driver_service(
 ) -> DriverService:
     """Return a DriverService for the current request."""
     return DriverService(client)
+
+
+def get_position_service(
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+) -> PositionService:
+    """Return a PositionService wired to the shared OpenF1Client."""
+    return PositionService(client)
