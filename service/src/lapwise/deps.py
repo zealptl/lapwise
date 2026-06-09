@@ -4,9 +4,12 @@ Each provider is injected by FastAPI's dependency injection system,
 keeping route handlers free from direct instantiation of collaborators.
 """
 
-from fastapi import Request
+from typing import Annotated
+
+from fastapi import Depends, Request
 
 from lapwise.clients.openf1 import OpenF1Client
+from lapwise.services.sessions import SessionService
 
 
 def get_openf1_client(request: Request) -> OpenF1Client:
@@ -25,12 +28,12 @@ async def get_auth() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Service providers — added by endpoint capabilities
+# Service providers
 # ---------------------------------------------------------------------------
-# Each endpoint capability will add a get_<resource>_service helper here.
-# Example (added in the endpoint-drivers capability):
-#
-#   def get_driver_service(
-#       client: Annotated[OpenF1Client, Depends(get_openf1_client)],
-#   ) -> DriverService:
-#       return DriverService(client)
+
+
+def get_session_service(
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+) -> SessionService:
+    """Return a SessionService for the current request."""
+    return SessionService(client)
