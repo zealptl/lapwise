@@ -185,14 +185,14 @@ git pull origin main
 
 > Branch: `feat/endpoint-sessions`. Start from `main` after section 6 merges.
 
-- [ ] 7.1 Create `src/lapwise/models/sessions.py` defining `Session`
-- [ ] 7.2 Create `src/lapwise/services/sessions.py` defining `SessionService.list_sessions`
-- [ ] 7.3 Add `get_session_service` provider in `src/lapwise/deps.py`
-- [ ] 7.4 Create `src/lapwise/routes/v1/sessions.py` with `GET /sessions`, `session_key: int | Literal["latest"] | None`, `meeting_key`, `country_name`, `session_name`, `session_type`, `year`, plus rich OpenAPI metadata
-- [ ] 7.5 Register router
-- [ ] 7.6 Unit tests for service and route incl. `latest` pass-through
-- [ ] 7.7 Lint, type-check, tests pass
-- [ ] 7.8 Commit, push, open PR, merge with branch deletion, pull main
+- [x] 7.1 Create `src/lapwise/models/sessions.py` defining `Session`
+- [x] 7.2 Create `src/lapwise/services/sessions.py` defining `SessionService.list_sessions`
+- [x] 7.3 Add `get_session_service` provider in `src/lapwise/deps.py`
+- [x] 7.4 Create `src/lapwise/routes/v1/sessions.py` with `GET /sessions`, `session_key: int | Literal["latest"] | None`, `meeting_key`, `country_name`, `session_name`, `session_type`, `year`, plus rich OpenAPI metadata
+- [x] 7.5 Register router
+- [x] 7.6 Unit tests for service and route incl. `latest` pass-through
+- [x] 7.7 Lint, type-check, tests pass
+- [x] 7.8 Commit, push, open PR, merge with branch deletion, pull main
 
 ---
 
