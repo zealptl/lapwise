@@ -268,7 +268,7 @@ git worktree remove ../lapwise-<capability>
 - [x] 12.5 Register router
 - [x] 12.6 Unit tests for service and route incl. `tyre_age_at_start_gte` translation
 - [x] 12.7 Lint, type-check, tests pass
-- [ ] 12.8 Commit, push, open PR, merge with branch deletion
+- [x] 12.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
@@ -276,13 +276,13 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-endpoint-starting-grid`, branch: `feat/endpoint-starting-grid`.
 
-- [ ] 13.1 Create `src/lapwise/models/starting_grid.py` defining `StartingGridEntry`
-- [ ] 13.2 Create `src/lapwise/services/starting_grid.py` defining `StartingGridService.list_grid`
-- [ ] 13.3 Add `get_starting_grid_service` provider in `src/lapwise/deps.py`
-- [ ] 13.4 Create `src/lapwise/routes/v1/starting_grid.py` with `GET /starting_grid`, params: `session_key`, `meeting_key`, `driver_number: list[int] | None`, `position`, `position_lt`, `position_lte`, `position_gt`, `position_gte`. Rich OpenAPI metadata
-- [ ] 13.5 Register router
-- [ ] 13.6 Unit tests for service and route incl. `position_lte` translation
-- [ ] 13.7 Lint, type-check, tests pass
+- [x] 13.1 Create `src/lapwise/models/starting_grid.py` defining `StartingGridEntry`
+- [x] 13.2 Create `src/lapwise/services/starting_grid.py` defining `StartingGridService.list_grid`
+- [x] 13.3 Add `get_starting_grid_service` provider in `src/lapwise/deps.py`
+- [x] 13.4 Create `src/lapwise/routes/v1/starting_grid.py` with `GET /starting_grid`, params: `session_key`, `meeting_key`, `driver_number: list[int] | None`, `position`, `position_lt`, `position_lte`, `position_gt`, `position_gte`. Rich OpenAPI metadata
+- [x] 13.5 Register router
+- [x] 13.6 Unit tests for service and route incl. `position_lte` translation
+- [x] 13.7 Lint, type-check, tests pass
 - [ ] 13.8 Commit, push, open PR, merge with branch deletion
 
 ---

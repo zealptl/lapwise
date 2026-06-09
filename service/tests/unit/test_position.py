@@ -9,7 +9,6 @@ from lapwise.main import create_app
 from lapwise.models.position import Position
 from lapwise.services.position import PositionService
 
-
 # ---------------------------------------------------------------------------
 # Service unit tests
 # ---------------------------------------------------------------------------
