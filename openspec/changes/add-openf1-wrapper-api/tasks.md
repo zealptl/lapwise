@@ -223,7 +223,7 @@ git worktree remove ../lapwise-<capability>
 - [x] 9.5 Register router
 - [x] 9.6 Unit tests for service and route incl. `stop_duration_lt` translation
 - [x] 9.7 Lint, type-check, tests pass
-- [ ] 9.8 Commit, push, open PR, merge with branch deletion
+- [x] 9.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
@@ -246,13 +246,13 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-endpoint-overtakes`, branch: `feat/endpoint-overtakes`.
 
-- [ ] 11.1 Create `src/lapwise/models/overtakes.py` defining `Overtake`
-- [ ] 11.2 Create `src/lapwise/services/overtakes.py` defining `OvertakeService.list_overtakes`
-- [ ] 11.3 Add `get_overtake_service` provider in `src/lapwise/deps.py`
-- [ ] 11.4 Create `src/lapwise/routes/v1/overtakes.py` with `GET /overtakes`, params: `session_key`, `meeting_key`, `overtaking_driver_number`, `overtaken_driver_number`, `position`. Rich OpenAPI metadata noting race-only / incomplete data
-- [ ] 11.5 Register router
-- [ ] 11.6 Unit tests for service and route
-- [ ] 11.7 Lint, type-check, tests pass
+- [x] 11.1 Create `src/lapwise/models/overtakes.py` defining `Overtake`
+- [x] 11.2 Create `src/lapwise/services/overtakes.py` defining `OvertakeService.list_overtakes`
+- [x] 11.3 Add `get_overtake_service` provider in `src/lapwise/deps.py`
+- [x] 11.4 Create `src/lapwise/routes/v1/overtakes.py` with `GET /overtakes`, params: `session_key`, `meeting_key`, `overtaking_driver_number`, `overtaken_driver_number`, `position`. Rich OpenAPI metadata noting race-only / incomplete data
+- [x] 11.5 Register router
+- [x] 11.6 Unit tests for service and route
+- [x] 11.7 Lint, type-check, tests pass
 - [ ] 11.8 Commit, push, open PR, merge with branch deletion
 
 ---

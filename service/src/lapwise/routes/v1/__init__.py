@@ -3,7 +3,16 @@
 from fastapi import APIRouter, Depends
 
 from lapwise.deps import get_auth
-from lapwise.routes.v1 import drivers, laps, meetings, pit, position, session_result, sessions
+from lapwise.routes.v1 import (
+    drivers,
+    laps,
+    meetings,
+    overtakes,
+    pit,
+    position,
+    session_result,
+    sessions,
+)
 
 router = APIRouter(
     prefix="/v1",
@@ -15,6 +24,7 @@ router.include_router(sessions.router)
 router.include_router(drivers.router)
 router.include_router(laps.router)
 router.include_router(meetings.router)
+router.include_router(overtakes.router)
 router.include_router(pit.router)
 router.include_router(session_result.router)
 router.include_router(position.router)
