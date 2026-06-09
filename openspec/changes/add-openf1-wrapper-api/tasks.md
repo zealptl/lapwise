@@ -36,13 +36,13 @@ git worktree remove ../lapwise-<capability>
 
 > One-time setup. No worktree — commit directly on `main` or via a short-lived `chore/bootstrap` branch.
 
-- [ ] 1.1 Create `.python-version` pinning Python `3.12`
-- [ ] 1.2 Create `pyproject.toml` with `[project]` metadata, dependencies (`fastapi`, `uvicorn[standard]`, `httpx`, `pydantic>=2`, `pydantic-settings`) and dev dependencies (`pytest`, `pytest-asyncio`, `respx`, `ruff`, `mypy`)
-- [ ] 1.3 Configure `[tool.ruff]` (line length, target version, lint rule selection) and `[tool.mypy]` (`strict = true` on `src/lapwise`)
-- [ ] 1.4 Run `uv sync` to generate `uv.lock`
-- [ ] 1.5 Create `src/lapwise/__init__.py` and `tests/__init__.py`
-- [ ] 1.6 Create `.gitignore` (Python, venv, `.idea`, `.vscode`, `.env`, `__pycache__`, `.mypy_cache`, `.ruff_cache`, `.pytest_cache`, `dist`, `build`)
-- [ ] 1.7 Create a minimal `README.md` documenting `uv sync`, `uv run uvicorn lapwise.main:app --reload`, `uv run pytest`, `uv run ruff check`, `uv run mypy src`
+- [x] 1.1 Create `.python-version` pinning Python `3.12`
+- [x] 1.2 Create `pyproject.toml` with `[project]` metadata, dependencies (`fastapi`, `uvicorn[standard]`, `httpx`, `pydantic>=2`, `pydantic-settings`) and dev dependencies (`pytest`, `pytest-asyncio`, `respx`, `ruff`, `mypy`)
+- [x] 1.3 Configure `[tool.ruff]` (line length, target version, lint rule selection) and `[tool.mypy]` (`strict = true` on `src/lapwise`)
+- [x] 1.4 Run `uv sync` to generate `uv.lock`
+- [x] 1.5 Create `src/lapwise/__init__.py` and `tests/__init__.py`
+- [x] 1.6 Create `.gitignore` (Python, venv, `.idea`, `.vscode`, `.env`, `__pycache__`, `.mypy_cache`, `.ruff_cache`, `.pytest_cache`, `dist`, `build`)
+- [x] 1.7 Create a minimal `README.md` documenting `uv sync`, `uv run uvicorn lapwise.main:app --reload`, `uv run pytest`, `uv run ruff check`, `uv run mypy src`
 - [ ] 1.8 Configure repo defaults: `gh repo edit --delete-branch-on-merge` (so PRs delete source branch on merge by default)
 - [ ] 1.9 Commit bootstrap and push to `main`
 
