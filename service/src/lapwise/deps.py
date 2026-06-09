@@ -19,6 +19,7 @@ from lapwise.services.session_result import SessionResultService
 from lapwise.services.sessions import SessionService
 from lapwise.services.starting_grid import StartingGridService
 from lapwise.services.stints import StintService
+from lapwise.services.weather import WeatherService
 
 
 def get_openf1_client(request: Request) -> OpenF1Client:
@@ -109,3 +110,10 @@ def get_starting_grid_service(
 ) -> StartingGridService:
     """Return a StartingGridService for the current request."""
     return StartingGridService(client)
+
+
+def get_weather_service(
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+) -> WeatherService:
+    """Return a WeatherService for the current request."""
+    return WeatherService(client)

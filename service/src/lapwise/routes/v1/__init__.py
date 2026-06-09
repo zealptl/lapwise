@@ -14,6 +14,7 @@ from lapwise.routes.v1 import (
     sessions,
     starting_grid,
     stints,
+    weather,
 )
 
 router = APIRouter(
@@ -32,3 +33,4 @@ router.include_router(session_result.router)
 router.include_router(stints.router)
 router.include_router(position.router)
 router.include_router(starting_grid.router)
+router.include_router(weather.router)

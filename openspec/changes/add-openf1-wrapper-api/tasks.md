@@ -283,7 +283,7 @@ git worktree remove ../lapwise-<capability>
 - [x] 13.5 Register router
 - [x] 13.6 Unit tests for service and route incl. `position_lte` translation
 - [x] 13.7 Lint, type-check, tests pass
-- [ ] 13.8 Commit, push, open PR, merge with branch deletion
+- [x] 13.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
@@ -291,13 +291,13 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-endpoint-weather`, branch: `feat/endpoint-weather`.
 
-- [ ] 14.1 Create `src/lapwise/models/weather.py` defining `Weather`
-- [ ] 14.2 Create `src/lapwise/services/weather.py` defining `WeatherService.list_weather`
-- [ ] 14.3 Add `get_weather_service` provider in `src/lapwise/deps.py`
-- [ ] 14.4 Create `src/lapwise/routes/v1/weather.py` with `GET /weather`, params: `session_key`, `meeting_key`, plus comparison suffixes for `air_temperature`, `track_temperature`, `humidity`, `pressure`, `rainfall`, `wind_speed`, `wind_direction`. Rich OpenAPI metadata
-- [ ] 14.5 Register router
-- [ ] 14.6 Unit tests for service and route incl. multiple `_gte` filters translated together
-- [ ] 14.7 Lint, type-check, tests pass
+- [x] 14.1 Create `src/lapwise/models/weather.py` defining `Weather`
+- [x] 14.2 Create `src/lapwise/services/weather.py` defining `WeatherService.list_weather`
+- [x] 14.3 Add `get_weather_service` provider in `src/lapwise/deps.py`
+- [x] 14.4 Create `src/lapwise/routes/v1/weather.py` with `GET /weather`, params: `session_key`, `meeting_key`, plus comparison suffixes for `air_temperature`, `track_temperature`, `humidity`, `pressure`, `rainfall`, `wind_speed`, `wind_direction`. Rich OpenAPI metadata
+- [x] 14.5 Register router
+- [x] 14.6 Unit tests for service and route incl. multiple `_gte` filters translated together
+- [x] 14.7 Lint, type-check, tests pass
 - [ ] 14.8 Commit, push, open PR, merge with branch deletion
 
 ---
