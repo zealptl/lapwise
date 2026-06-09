@@ -53,38 +53,38 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-openf1-client`, branch: `feat/openf1-client`.
 
-- [ ] 2.1 Create `src/lapwise/config.py` with `Settings(pydantic-settings)`: `openf1_base_url: str = "https://api.openf1.org/v1"`, `openf1_timeout_seconds: float = 10.0`. Add `get_settings()` cached dependency.
-- [ ] 2.2 Create `src/lapwise/clients/errors.py` with `UpstreamError(Exception)` carrying `category: Literal["bad_gateway", "gateway_timeout", "forwarded"]`, `upstream_status: int | None`, `upstream_message: str | None`
-- [ ] 2.3 Create `src/lapwise/clients/filters.py`:
-  - [ ] 2.3.1 Translator function `translate_filters(filters: dict) -> list[tuple[str, str]]`
-  - [ ] 2.3.2 Handles equality (str/int/float/bool), `None` skipping, list values (repeated keys), suffixes `_lt`/`_lte`/`_gt`/`_gte` (strip suffix, emit `<`/`<=`/`>`/`>=`)
-  - [ ] 2.3.3 Lowercase booleans in output
-- [ ] 2.4 Create `src/lapwise/clients/openf1.py`:
-  - [ ] 2.4.1 `OpenF1Client(settings: Settings)` constructs an `httpx.AsyncClient` with timeout from settings
-  - [ ] 2.4.2 `async def get(path: str, model: type[T], **filters) -> list[T]`
-  - [ ] 2.4.3 Calls `translate_filters`, builds URL, GETs upstream
-  - [ ] 2.4.4 Maps `httpx.TimeoutException` → `UpstreamError("gateway_timeout", ...)`
-  - [ ] 2.4.5 Maps other `httpx.HTTPError` (incl. ConnectError) → `UpstreamError("bad_gateway", ...)`
-  - [ ] 2.4.6 If status 5xx → `UpstreamError("bad_gateway", upstream_status=..., upstream_message=truncated_body)`
-  - [ ] 2.4.7 If status 4xx → `UpstreamError("forwarded", upstream_status=..., upstream_message=truncated_body)`
-  - [ ] 2.4.8 If JSON decode fails or body is not a list → `UpstreamError("bad_gateway", upstream_message="decode failure")`
-  - [ ] 2.4.9 On success, parse as `[model.model_validate(item) for item in body]`
-  - [ ] 2.4.10 `async def aclose()` closes the underlying client
-- [ ] 2.5 Unit tests `tests/unit/test_filters.py`:
-  - [ ] 2.5.1 Equality passes through
-  - [ ] 2.5.2 None values skipped
-  - [ ] 2.5.3 Lists become repeated keys
-  - [ ] 2.5.4 `_lt`/`_lte`/`_gt`/`_gte` translate to `<`/`<=`/`>`/`>=`
-  - [ ] 2.5.5 Booleans serialize as lowercase
-- [ ] 2.6 Unit tests `tests/unit/test_clients_openf1.py` using `respx`:
-  - [ ] 2.6.1 200 returns list of parsed models
-  - [ ] 2.6.2 5xx raises `UpstreamError("bad_gateway")` with status preserved
-  - [ ] 2.6.3 4xx raises `UpstreamError("forwarded")` with status preserved
-  - [ ] 2.6.4 Timeout raises `UpstreamError("gateway_timeout")`
-  - [ ] 2.6.5 Malformed JSON raises `UpstreamError("bad_gateway")`
-  - [ ] 2.6.6 Filter translation is visible in the upstream URL
-- [ ] 2.7 `uv run ruff check`, `uv run ruff format --check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` all pass
-- [ ] 2.8 Commit, push, open PR, merge with branch deletion
+- [x] 2.1 Create `src/lapwise/config.py` with `Settings(pydantic-settings)`: `openf1_base_url: str = "https://api.openf1.org/v1"`, `openf1_timeout_seconds: float = 10.0`. Add `get_settings()` cached dependency.
+- [x] 2.2 Create `src/lapwise/clients/errors.py` with `UpstreamError(Exception)` carrying `category: Literal["bad_gateway", "gateway_timeout", "forwarded"]`, `upstream_status: int | None`, `upstream_message: str | None`
+- [x] 2.3 Create `src/lapwise/clients/filters.py`:
+  - [x] 2.3.1 Translator function `translate_filters(filters: dict) -> list[tuple[str, str]]`
+  - [x] 2.3.2 Handles equality (str/int/float/bool), `None` skipping, list values (repeated keys), suffixes `_lt`/`_lte`/`_gt`/`_gte` (strip suffix, emit `<`/`<=`/`>`/`>=`)
+  - [x] 2.3.3 Lowercase booleans in output
+- [x] 2.4 Create `src/lapwise/clients/openf1.py`:
+  - [x] 2.4.1 `OpenF1Client(settings: Settings)` constructs an `httpx.AsyncClient` with timeout from settings
+  - [x] 2.4.2 `async def get(path: str, model: type[T], **filters) -> list[T]`
+  - [x] 2.4.3 Calls `translate_filters`, builds URL, GETs upstream
+  - [x] 2.4.4 Maps `httpx.TimeoutException` → `UpstreamError("gateway_timeout", ...)`
+  - [x] 2.4.5 Maps other `httpx.HTTPError` (incl. ConnectError) → `UpstreamError("bad_gateway", ...)`
+  - [x] 2.4.6 If status 5xx → `UpstreamError("bad_gateway", upstream_status=..., upstream_message=truncated_body)`
+  - [x] 2.4.7 If status 4xx → `UpstreamError("forwarded", upstream_status=..., upstream_message=truncated_body)`
+  - [x] 2.4.8 If JSON decode fails or body is not a list → `UpstreamError("bad_gateway", upstream_message="decode failure")`
+  - [x] 2.4.9 On success, parse as `[model.model_validate(item) for item in body]`
+  - [x] 2.4.10 `async def aclose()` closes the underlying client
+- [x] 2.5 Unit tests `tests/unit/test_filters.py`:
+  - [x] 2.5.1 Equality passes through
+  - [x] 2.5.2 None values skipped
+  - [x] 2.5.3 Lists become repeated keys
+  - [x] 2.5.4 `_lt`/`_lte`/`_gt`/`_gte` translate to `<`/`<=`/`>`/`>=`
+  - [x] 2.5.5 Booleans serialize as lowercase
+- [x] 2.6 Unit tests `tests/unit/test_clients_openf1.py` using `respx`:
+  - [x] 2.6.1 200 returns list of parsed models
+  - [x] 2.6.2 5xx raises `UpstreamError("bad_gateway")` with status preserved
+  - [x] 2.6.3 4xx raises `UpstreamError("forwarded")` with status preserved
+  - [x] 2.6.4 Timeout raises `UpstreamError("gateway_timeout")`
+  - [x] 2.6.5 Malformed JSON raises `UpstreamError("bad_gateway")`
+  - [x] 2.6.6 Filter translation is visible in the upstream URL
+- [x] 2.7 `uv run ruff check`, `uv run ruff format --check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` all pass
+- [x] 2.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
