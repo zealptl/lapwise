@@ -208,7 +208,7 @@ git worktree remove ../lapwise-<capability>
 - [x] 8.5 Register router
 - [x] 8.6 Unit tests for service and route incl. `position_lte` translating to `position<=3`
 - [x] 8.7 Lint, type-check, tests pass
-- [ ] 8.8 Commit, push, open PR, merge with branch deletion
+- [x] 8.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
@@ -216,13 +216,13 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-endpoint-pit`, branch: `feat/endpoint-pit`.
 
-- [ ] 9.1 Create `src/lapwise/models/pit.py` defining `PitStop`
-- [ ] 9.2 Create `src/lapwise/services/pit.py` defining `PitService.list_pit_stops`
-- [ ] 9.3 Add `get_pit_service` provider in `src/lapwise/deps.py`
-- [ ] 9.4 Create `src/lapwise/routes/v1/pit.py` with `GET /pit`, params: `session_key`, `meeting_key`, `driver_number: list[int] | None`, `lap_number`, `stop_duration_lt`, `stop_duration_lte`, `stop_duration_gt`, `stop_duration_gte`. Rich OpenAPI metadata
-- [ ] 9.5 Register router
-- [ ] 9.6 Unit tests for service and route incl. `stop_duration_lt` translation
-- [ ] 9.7 Lint, type-check, tests pass
+- [x] 9.1 Create `src/lapwise/models/pit.py` defining `PitStop`
+- [x] 9.2 Create `src/lapwise/services/pit.py` defining `PitService.list_pit_stops`
+- [x] 9.3 Add `get_pit_service` provider in `src/lapwise/deps.py`
+- [x] 9.4 Create `src/lapwise/routes/v1/pit.py` with `GET /pit`, params: `session_key`, `meeting_key`, `driver_number: list[int] | None`, `lap_number`, `stop_duration_lt`, `stop_duration_lte`, `stop_duration_gt`, `stop_duration_gte`. Rich OpenAPI metadata
+- [x] 9.5 Register router
+- [x] 9.6 Unit tests for service and route incl. `stop_duration_lt` translation
+- [x] 9.7 Lint, type-check, tests pass
 - [ ] 9.8 Commit, push, open PR, merge with branch deletion
 
 ---
