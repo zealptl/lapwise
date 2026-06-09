@@ -43,8 +43,8 @@ git worktree remove ../lapwise-<capability>
 - [x] 1.5 Create `src/lapwise/__init__.py` and `tests/__init__.py`
 - [x] 1.6 Create `.gitignore` (Python, venv, `.idea`, `.vscode`, `.env`, `__pycache__`, `.mypy_cache`, `.ruff_cache`, `.pytest_cache`, `dist`, `build`)
 - [x] 1.7 Create a minimal `README.md` documenting `uv sync`, `uv run uvicorn lapwise.main:app --reload`, `uv run pytest`, `uv run ruff check`, `uv run mypy src`
-- [ ] 1.8 Configure repo defaults: `gh repo edit --delete-branch-on-merge` (so PRs delete source branch on merge by default)
-- [ ] 1.9 Commit bootstrap and push to `main`
+- [x] 1.8 Configure repo defaults: `gh repo edit --delete-branch-on-merge` (so PRs delete source branch on merge by default)
+- [x] 1.9 Commit bootstrap and push to `main`
 
 ---
 
