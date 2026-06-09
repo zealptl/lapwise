@@ -12,6 +12,7 @@ from lapwise.routes.v1 import (
     position,
     session_result,
     sessions,
+    starting_grid,
     stints,
 )
 
@@ -30,3 +31,4 @@ router.include_router(pit.router)
 router.include_router(session_result.router)
 router.include_router(stints.router)
 router.include_router(position.router)
+router.include_router(starting_grid.router)

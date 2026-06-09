@@ -17,6 +17,7 @@ from lapwise.services.pit import PitService
 from lapwise.services.position import PositionService
 from lapwise.services.session_result import SessionResultService
 from lapwise.services.sessions import SessionService
+from lapwise.services.starting_grid import StartingGridService
 from lapwise.services.stints import StintService
 
 
@@ -101,3 +102,10 @@ def get_stint_service(
 ) -> StintService:
     """Return a StintService for the current request."""
     return StintService(client)
+
+
+def get_starting_grid_service(
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+) -> StartingGridService:
+    """Return a StartingGridService for the current request."""
+    return StartingGridService(client)
