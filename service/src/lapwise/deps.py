@@ -9,6 +9,7 @@ from typing import Annotated
 from fastapi import Depends, Request
 
 from lapwise.clients.openf1 import OpenF1Client
+from lapwise.services.drivers import DriverService
 from lapwise.services.sessions import SessionService
 
 
@@ -37,3 +38,10 @@ def get_session_service(
 ) -> SessionService:
     """Return a SessionService for the current request."""
     return SessionService(client)
+
+
+def get_driver_service(
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+) -> DriverService:
+    """Return a DriverService for the current request."""
+    return DriverService(client)

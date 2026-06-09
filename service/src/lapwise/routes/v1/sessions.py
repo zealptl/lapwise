@@ -41,7 +41,7 @@ _200_EXAMPLE = [
     }
 ]
 
-_RESPONSES: dict[int | str, dict] = {
+_RESPONSES: dict[int | str, dict[str, object]] = {
     200: {
         "description": "Sessions matching the supplied filters.",
         "content": {"application/json": {"example": _200_EXAMPLE}},
