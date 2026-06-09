@@ -126,20 +126,20 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-endpoint-drivers`, branch: `feat/endpoint-drivers`.
 
-- [ ] 4.1 Create `src/lapwise/models/drivers.py` defining `Driver` (fields per spec)
-- [ ] 4.2 Create `src/lapwise/services/drivers.py` defining `DriverService.list_drivers(**filters) -> list[Driver]`
-- [ ] 4.3 Add `get_driver_service` provider in `src/lapwise/deps.py`
-- [ ] 4.4 Create `src/lapwise/routes/v1/drivers.py`:
-  - [ ] 4.4.1 `GET /drivers` returning `list[Driver]`
-  - [ ] 4.4.2 Typed query params: `driver_number: list[int] | None`, `session_key: int | str | None`, `meeting_key: int | str | None`, plus other OpenF1-documented equality fields
-  - [ ] 4.4.3 `summary`, multi-paragraph `description` linking to OpenF1 docs, per-`Query` descriptions/examples
-  - [ ] 4.4.4 `responses` dict with examples for 200/422/502/504
-- [ ] 4.5 Register `routes/v1/drivers.router` in `routes/v1/__init__.py`
-- [ ] 4.6 Unit tests:
-  - [ ] 4.6.1 `tests/unit/test_services_drivers.py` — service forwards filters and returns parsed list (client mocked)
-  - [ ] 4.6.2 `tests/unit/test_routes_drivers.py` — TestClient with mocked service: equality filter, repeated `driver_number` becomes list[int], 502 path
-- [ ] 4.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
-- [ ] 4.8 Commit, push, open PR, merge with branch deletion
+- [x] 4.1 Create `src/lapwise/models/drivers.py` defining `Driver` (fields per spec)
+- [x] 4.2 Create `src/lapwise/services/drivers.py` defining `DriverService.list_drivers(**filters) -> list[Driver]`
+- [x] 4.3 Add `get_driver_service` provider in `src/lapwise/deps.py`
+- [x] 4.4 Create `src/lapwise/routes/v1/drivers.py`:
+  - [x] 4.4.1 `GET /drivers` returning `list[Driver]`
+  - [x] 4.4.2 Typed query params: `driver_number: list[int] | None`, `session_key: int | str | None`, `meeting_key: int | str | None`, plus other OpenF1-documented equality fields
+  - [x] 4.4.3 `summary`, multi-paragraph `description` linking to OpenF1 docs, per-`Query` descriptions/examples
+  - [x] 4.4.4 `responses` dict with examples for 200/422/502/504
+- [x] 4.5 Register `routes/v1/drivers.router` in `routes/v1/__init__.py`
+- [x] 4.6 Unit tests:
+  - [x] 4.6.1 `tests/unit/test_services_drivers.py` — service forwards filters and returns parsed list (client mocked)
+  - [x] 4.6.2 `tests/unit/test_routes_drivers.py` — TestClient with mocked service: equality filter, repeated `driver_number` becomes list[int], 502 path
+- [x] 4.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
+- [x] 4.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
@@ -147,20 +147,20 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-endpoint-laps`, branch: `feat/endpoint-laps`.
 
-- [ ] 5.1 Create `src/lapwise/models/laps.py` defining `Lap` (fields per spec)
-- [ ] 5.2 Create `src/lapwise/services/laps.py` defining `LapService.list_laps(**filters) -> list[Lap]`
-- [ ] 5.3 Add `get_lap_service` provider in `src/lapwise/deps.py`
-- [ ] 5.4 Create `src/lapwise/routes/v1/laps.py`:
-  - [ ] 5.4.1 `GET /laps` returning `list[Lap]`
-  - [ ] 5.4.2 Typed query params including comparison suffixes: `lap_duration_lt`, `lap_duration_lte`, `lap_duration_gt`, `lap_duration_gte`, `lap_number`, `driver_number: list[int] | None`, `session_key`, `meeting_key`, `is_pit_out_lap`
-  - [ ] 5.4.3 Rich OpenAPI metadata (summary, description with OpenF1 link, param descriptions, examples)
-  - [ ] 5.4.4 `responses` dict with examples for 200/422/502/504
-- [ ] 5.5 Register `routes/v1/laps.router` in `routes/v1/__init__.py`
-- [ ] 5.6 Unit tests:
-  - [ ] 5.6.1 `tests/unit/test_services_laps.py` — service forwards filters
-  - [ ] 5.6.2 `tests/unit/test_routes_laps.py` — equality and comparison suffix filters; verify the upstream URL captured by the mocked client contains `lap_duration<...`
-- [ ] 5.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
-- [ ] 5.8 Commit, push, open PR, merge with branch deletion
+- [x] 5.1 Create `src/lapwise/models/laps.py` defining `Lap` (fields per spec)
+- [x] 5.2 Create `src/lapwise/services/laps.py` defining `LapService.list_laps(**filters) -> list[Lap]`
+- [x] 5.3 Add `get_lap_service` provider in `src/lapwise/deps.py`
+- [x] 5.4 Create `src/lapwise/routes/v1/laps.py`:
+  - [x] 5.4.1 `GET /laps` returning `list[Lap]`
+  - [x] 5.4.2 Typed query params including comparison suffixes: `lap_duration_lt`, `lap_duration_lte`, `lap_duration_gt`, `lap_duration_gte`, `lap_number`, `driver_number: list[int] | None`, `session_key`, `meeting_key`, `is_pit_out_lap`
+  - [x] 5.4.3 Rich OpenAPI metadata (summary, description with OpenF1 link, param descriptions, examples)
+  - [x] 5.4.4 `responses` dict with examples for 200/422/502/504
+- [x] 5.5 Register `routes/v1/laps.router` in `routes/v1/__init__.py`
+- [x] 5.6 Unit tests:
+  - [x] 5.6.1 `tests/unit/test_services_laps.py` — service forwards filters
+  - [x] 5.6.2 `tests/unit/test_routes_laps.py` — equality and comparison suffix filters; verify the upstream URL captured by the mocked client contains `lap_duration<...`
+- [x] 5.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
+- [x] 5.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
@@ -186,14 +186,14 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-endpoint-sessions`, branch: `feat/endpoint-sessions`.
 
-- [ ] 7.1 Create `src/lapwise/models/sessions.py` defining `Session`
-- [ ] 7.2 Create `src/lapwise/services/sessions.py` defining `SessionService.list_sessions`
-- [ ] 7.3 Add `get_session_service` provider in `src/lapwise/deps.py`
-- [ ] 7.4 Create `src/lapwise/routes/v1/sessions.py` with `GET /sessions`, `session_key: int | Literal["latest"] | None`, `meeting_key`, `country_name`, `session_name`, `session_type`, `year`, plus rich OpenAPI metadata
-- [ ] 7.5 Register router
-- [ ] 7.6 Unit tests for service and route incl. `latest` pass-through
-- [ ] 7.7 Lint, type-check, tests pass
-- [ ] 7.8 Commit, push, open PR, merge with branch deletion
+- [x] 7.1 Create `src/lapwise/models/sessions.py` defining `Session`
+- [x] 7.2 Create `src/lapwise/services/sessions.py` defining `SessionService.list_sessions`
+- [x] 7.3 Add `get_session_service` provider in `src/lapwise/deps.py`
+- [x] 7.4 Create `src/lapwise/routes/v1/sessions.py` with `GET /sessions`, `session_key: int | Literal["latest"] | None`, `meeting_key`, `country_name`, `session_name`, `session_type`, `year`, plus rich OpenAPI metadata
+- [x] 7.5 Register router
+- [x] 7.6 Unit tests for service and route incl. `latest` pass-through
+- [x] 7.7 Lint, type-check, tests pass
+- [x] 7.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
