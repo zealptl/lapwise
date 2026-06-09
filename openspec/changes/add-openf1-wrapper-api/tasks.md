@@ -125,19 +125,19 @@ git pull origin main
 
 > Branch: `feat/endpoint-drivers`. Start from `main` after section 3 merges.
 
-- [ ] 4.1 Create `src/lapwise/models/drivers.py` defining `Driver` (fields per spec)
-- [ ] 4.2 Create `src/lapwise/services/drivers.py` defining `DriverService.list_drivers(**filters) -> list[Driver]`
-- [ ] 4.3 Add `get_driver_service` provider in `src/lapwise/deps.py`
-- [ ] 4.4 Create `src/lapwise/routes/v1/drivers.py`:
-  - [ ] 4.4.1 `GET /drivers` returning `list[Driver]`
-  - [ ] 4.4.2 Typed query params: `driver_number: list[int] | None`, `session_key: int | str | None`, `meeting_key: int | str | None`, plus other OpenF1-documented equality fields
-  - [ ] 4.4.3 `summary`, multi-paragraph `description` linking to OpenF1 docs, per-`Query` descriptions/examples
-  - [ ] 4.4.4 `responses` dict with examples for 200/422/502/504
-- [ ] 4.5 Register `routes/v1/drivers.router` in `routes/v1/__init__.py`
-- [ ] 4.6 Unit tests:
-  - [ ] 4.6.1 `tests/unit/test_services_drivers.py` — service forwards filters and returns parsed list (client mocked)
-  - [ ] 4.6.2 `tests/unit/test_routes_drivers.py` — TestClient with mocked service: equality filter, repeated `driver_number` becomes list[int], 502 path
-- [ ] 4.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
+- [x] 4.1 Create `src/lapwise/models/drivers.py` defining `Driver` (fields per spec)
+- [x] 4.2 Create `src/lapwise/services/drivers.py` defining `DriverService.list_drivers(**filters) -> list[Driver]`
+- [x] 4.3 Add `get_driver_service` provider in `src/lapwise/deps.py`
+- [x] 4.4 Create `src/lapwise/routes/v1/drivers.py`:
+  - [x] 4.4.1 `GET /drivers` returning `list[Driver]`
+  - [x] 4.4.2 Typed query params: `driver_number: list[int] | None`, `session_key: int | str | None`, `meeting_key: int | str | None`, plus other OpenF1-documented equality fields
+  - [x] 4.4.3 `summary`, multi-paragraph `description` linking to OpenF1 docs, per-`Query` descriptions/examples
+  - [x] 4.4.4 `responses` dict with examples for 200/422/502/504
+- [x] 4.5 Register `routes/v1/drivers.router` in `routes/v1/__init__.py`
+- [x] 4.6 Unit tests:
+  - [x] 4.6.1 `tests/unit/test_services_drivers.py` — service forwards filters and returns parsed list (client mocked)
+  - [x] 4.6.2 `tests/unit/test_routes_drivers.py` — TestClient with mocked service: equality filter, repeated `driver_number` becomes list[int], 502 path
+- [x] 4.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
 - [ ] 4.8 Commit, push, open PR, merge with branch deletion, pull main
 
 ---
