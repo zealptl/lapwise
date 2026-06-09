@@ -17,6 +17,7 @@ from lapwise.services.pit import PitService
 from lapwise.services.position import PositionService
 from lapwise.services.session_result import SessionResultService
 from lapwise.services.sessions import SessionService
+from lapwise.services.stints import StintService
 
 
 def get_openf1_client(request: Request) -> OpenF1Client:
@@ -93,3 +94,10 @@ def get_position_service(
 ) -> PositionService:
     """Return a PositionService wired to the shared OpenF1Client."""
     return PositionService(client)
+
+
+def get_stint_service(
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+) -> StintService:
+    """Return a StintService for the current request."""
+    return StintService(client)

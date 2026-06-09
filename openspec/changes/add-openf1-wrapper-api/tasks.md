@@ -253,7 +253,7 @@ git worktree remove ../lapwise-<capability>
 - [x] 11.5 Register router
 - [x] 11.6 Unit tests for service and route
 - [x] 11.7 Lint, type-check, tests pass
-- [ ] 11.8 Commit, push, open PR, merge with branch deletion
+- [x] 11.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
@@ -261,13 +261,13 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-endpoint-stints`, branch: `feat/endpoint-stints`.
 
-- [ ] 12.1 Create `src/lapwise/models/stints.py` defining `Stint`
-- [ ] 12.2 Create `src/lapwise/services/stints.py` defining `StintService.list_stints`
-- [ ] 12.3 Add `get_stint_service` provider in `src/lapwise/deps.py`
-- [ ] 12.4 Create `src/lapwise/routes/v1/stints.py` with `GET /stints`, params: `session_key`, `meeting_key`, `driver_number: list[int] | None`, `stint_number`, `compound`, `tyre_age_at_start`, `tyre_age_at_start_lt`, `tyre_age_at_start_lte`, `tyre_age_at_start_gt`, `tyre_age_at_start_gte`. Rich OpenAPI metadata
-- [ ] 12.5 Register router
-- [ ] 12.6 Unit tests for service and route incl. `tyre_age_at_start_gte` translation
-- [ ] 12.7 Lint, type-check, tests pass
+- [x] 12.1 Create `src/lapwise/models/stints.py` defining `Stint`
+- [x] 12.2 Create `src/lapwise/services/stints.py` defining `StintService.list_stints`
+- [x] 12.3 Add `get_stint_service` provider in `src/lapwise/deps.py`
+- [x] 12.4 Create `src/lapwise/routes/v1/stints.py` with `GET /stints`, params: `session_key`, `meeting_key`, `driver_number: list[int] | None`, `stint_number`, `compound`, `tyre_age_at_start`, `tyre_age_at_start_lt`, `tyre_age_at_start_lte`, `tyre_age_at_start_gt`, `tyre_age_at_start_gte`. Rich OpenAPI metadata
+- [x] 12.5 Register router
+- [x] 12.6 Unit tests for service and route incl. `tyre_age_at_start_gte` translation
+- [x] 12.7 Lint, type-check, tests pass
 - [ ] 12.8 Commit, push, open PR, merge with branch deletion
 
 ---
