@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(openspec *)",
+      "Bash(openspec *)",
+      "Bash(uv *)",
+      "Bash(git *)",
+      "Bash(mkdir -p *)",
+      "Read(//Users/zealpatel/development/vibes/lapwise-openf1-client/service/tests/**)",
+      "Bash(uv run *)",
+      "Read(//Users/zealpatel/development/vibes/lapwise-openf1-client/**)",
+      "Bash(gh *)",
+      "Bash(python *)",
+      "Bash(uv pip *)",
+      "Read(/Users/zealpatel/development/vibes/lapwise-*/**)",
+      "Write(/Users/zealpatel/development/vibes/lapwise-*/**)",
+      "Edit(/Users/zealpatel/development/vibes/lapwise-*/**)"
+    ]
+  }
+}
