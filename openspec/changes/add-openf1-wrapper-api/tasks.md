@@ -298,7 +298,7 @@ git worktree remove ../lapwise-<capability>
 - [x] 14.5 Register router
 - [x] 14.6 Unit tests for service and route incl. multiple `_gte` filters translated together
 - [x] 14.7 Lint, type-check, tests pass
-- [ ] 14.8 Commit, push, open PR, merge with branch deletion
+- [x] 14.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
@@ -306,13 +306,13 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-endpoint-championship-drivers`, branch: `feat/endpoint-championship-drivers`.
 
-- [ ] 15.1 Create or extend `src/lapwise/models/championship.py` defining `ChampionshipDriver`
-- [ ] 15.2 Create `src/lapwise/services/championship.py` (or extend) defining `ChampionshipDriverService.list_standings`
-- [ ] 15.3 Add `get_championship_driver_service` provider in `src/lapwise/deps.py`
-- [ ] 15.4 Create `src/lapwise/routes/v1/championship_drivers.py` with `GET /championship_drivers`, params: `session_key: int | Literal["latest"] | None`, `meeting_key: int | Literal["latest"] | None`, `driver_number: list[int] | None`. Rich OpenAPI metadata noting beta / race-only
-- [ ] 15.5 Register router
-- [ ] 15.6 Unit tests for service and route incl. repeated `driver_number`
-- [ ] 15.7 Lint, type-check, tests pass
+- [x] 15.1 Create or extend `src/lapwise/models/championship.py` defining `ChampionshipDriver`
+- [x] 15.2 Create `src/lapwise/services/championship.py` (or extend) defining `ChampionshipDriverService.list_standings`
+- [x] 15.3 Add `get_championship_driver_service` provider in `src/lapwise/deps.py`
+- [x] 15.4 Create `src/lapwise/routes/v1/championship_drivers.py` with `GET /championship_drivers`, params: `session_key: int | Literal["latest"] | None`, `meeting_key: int | Literal["latest"] | None`, `driver_number: list[int] | None`. Rich OpenAPI metadata noting beta / race-only
+- [x] 15.5 Register router
+- [x] 15.6 Unit tests for service and route incl. repeated `driver_number`
+- [x] 15.7 Lint, type-check, tests pass
 - [ ] 15.8 Commit, push, open PR, merge with branch deletion
 
 ---
@@ -321,13 +321,13 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-endpoint-championship-teams`, branch: `feat/endpoint-championship-teams`.
 
-- [ ] 16.1 Create or extend `src/lapwise/models/championship.py` defining `ChampionshipTeam`
-- [ ] 16.2 Create or extend `src/lapwise/services/championship.py` defining `ChampionshipTeamService.list_standings`
-- [ ] 16.3 Add `get_championship_team_service` provider in `src/lapwise/deps.py`
-- [ ] 16.4 Create `src/lapwise/routes/v1/championship_teams.py` with `GET /championship_teams`, params: `session_key: int | Literal["latest"] | None`, `meeting_key: int | Literal["latest"] | None`, `team_name`. Rich OpenAPI metadata noting beta / race-only
-- [ ] 16.5 Register router
-- [ ] 16.6 Unit tests for service and route
-- [ ] 16.7 Lint, type-check, tests pass
+- [x] 16.1 Create or extend `src/lapwise/models/championship.py` defining `ChampionshipTeam`
+- [x] 16.2 Create or extend `src/lapwise/services/championship.py` defining `ChampionshipTeamService.list_standings`
+- [x] 16.3 Add `get_championship_team_service` provider in `src/lapwise/deps.py`
+- [x] 16.4 Create `src/lapwise/routes/v1/championship_teams.py` with `GET /championship_teams`, params: `session_key: int | Literal["latest"] | None`, `meeting_key: int | Literal["latest"] | None`, `team_name`. Rich OpenAPI metadata noting beta / race-only
+- [x] 16.5 Register router
+- [x] 16.6 Unit tests for service and route
+- [x] 16.7 Lint, type-check, tests pass
 - [ ] 16.8 Commit, push, open PR, merge with branch deletion
 
 ---

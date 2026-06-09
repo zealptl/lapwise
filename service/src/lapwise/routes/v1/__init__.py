@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends
 
 from lapwise.deps import get_auth
 from lapwise.routes.v1 import (
+    championship_drivers,
+    championship_teams,
     drivers,
     laps,
     meetings,
@@ -34,3 +36,5 @@ router.include_router(stints.router)
 router.include_router(position.router)
 router.include_router(starting_grid.router)
 router.include_router(weather.router)
+router.include_router(championship_drivers.router)
+router.include_router(championship_teams.router)
