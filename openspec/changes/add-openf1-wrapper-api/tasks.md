@@ -313,7 +313,7 @@ git worktree remove ../lapwise-<capability>
 - [x] 15.5 Register router
 - [x] 15.6 Unit tests for service and route incl. repeated `driver_number`
 - [x] 15.7 Lint, type-check, tests pass
-- [ ] 15.8 Commit, push, open PR, merge with branch deletion
+- [x] 15.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
@@ -328,15 +328,15 @@ git worktree remove ../lapwise-<capability>
 - [x] 16.5 Register router
 - [x] 16.6 Unit tests for service and route
 - [x] 16.7 Lint, type-check, tests pass
-- [ ] 16.8 Commit, push, open PR, merge with branch deletion
+- [x] 16.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
 ## 17. Final integration check (sequential — run on `main` after all endpoint capabilities merge)
 
-- [ ] 17.1 Pull `main` locally
-- [ ] 17.2 `uv sync`
-- [ ] 17.3 `uv run pytest tests/unit -q` — full suite green
-- [ ] 17.4 `uv run ruff check`, `uv run ruff format --check`, `uv run mypy src/lapwise` — all clean
-- [ ] 17.5 `uv run uvicorn lapwise.main:app` — manually spot-check `/docs` shows all 13 endpoints under `OpenF1 wrappers` tag with rich descriptions and examples
-- [ ] 17.6 Verify `/openapi.json` includes `502` and `504` response shapes for every wrapper endpoint
+- [x] 17.1 Pull `main` locally
+- [x] 17.2 `uv sync`
+- [x] 17.3 `uv run pytest tests/unit -q` — full suite green
+- [x] 17.4 `uv run ruff check`, `uv run ruff format --check`, `uv run mypy src/lapwise` — all clean
+- [x] 17.5 `uv run uvicorn lapwise.main:app` — manually spot-check `/docs` shows all 13 endpoints under `OpenF1 wrappers` tag with rich descriptions and examples
+- [x] 17.6 Verify `/openapi.json` includes `502` and `504` response shapes for every wrapper endpoint
