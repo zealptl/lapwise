@@ -3,19 +3,18 @@
 **Workflow per capability** (sections 2–16 each follow this exact loop — do NOT skip steps):
 
 ```bash
-# 1. Checkout a new feature branch from main
-git checkout main
-git pull origin main
-git checkout -b feat/<capability>
+# 1. From repo root, create a worktree off main
+git worktree add ../lapwise-<capability> -b feat/<capability>
+cd ../lapwise-<capability>/service   # all uv commands run from service/
 
 # 2. Implement the tasks in this section
 # 3. Tick each task box (- [ ] → - [x]) as you complete it in tasks.md
-
-# 4. Commit
+# 4. Commit (from repo root of the worktree)
+cd ..
 git add -A
 git commit -m "feat(<capability>): <summary>"
 
-# 5. Push and open PR
+# 5. Push and open PR with auto-delete of source branch on merge
 git push -u origin feat/<capability>
 gh pr create \
   --title "feat(<capability>): <summary>" \
@@ -25,16 +24,18 @@ gh pr create \
 # 6. Merge with branch deletion
 gh pr merge --squash --delete-branch --auto
 
-# 7. Pull main and move to the next section
-git checkout main
-git pull origin main
+# 7. Clean up worktree
+cd ../lapwise
+git worktree remove ../lapwise-<capability>
 ```
+
+> **Ordering rule:** Section 1 (repo bootstrap) and sections 2–3 (foundation capabilities) MUST merge to `main` sequentially before sections 4–16 (endpoint capabilities) are started. Sections 4–16 are independent and SHOULD be implemented in parallel worktrees.
 
 ---
 
-## 1. Repo bootstrap (run on `main` directly)
+## 1. Repo bootstrap (sequential, run on `main` directly)
 
-> One-time setup. Commit directly on `main` or via a short-lived `chore/bootstrap` branch.
+> One-time setup. No worktree — commit directly on `main` or via a short-lived `chore/bootstrap` branch.
 
 - [x] 1.1 Create `.python-version` pinning Python `3.12`
 - [x] 1.2 Create `pyproject.toml` with `[project]` metadata, dependencies (`fastapi`, `uvicorn[standard]`, `httpx`, `pydantic>=2`, `pydantic-settings`) and dev dependencies (`pytest`, `pytest-asyncio`, `respx`, `ruff`, `mypy`)
@@ -48,9 +49,9 @@ git pull origin main
 
 ---
 
-## 2. Capability: `openf1-client`
+## 2. Capability: `openf1-client` (foundation — must merge before any endpoint capability)
 
-> Branch: `feat/openf1-client`. Start from `main`.
+> Worktree: `../lapwise-openf1-client`, branch: `feat/openf1-client`.
 
 - [x] 2.1 Create `src/lapwise/config.py` with `Settings(pydantic-settings)`: `openf1_base_url: str = "https://api.openf1.org/v1"`, `openf1_timeout_seconds: float = 10.0`. Add `get_settings()` cached dependency.
 - [x] 2.2 Create `src/lapwise/clients/errors.py` with `UpstreamError(Exception)` carrying `category: Literal["bad_gateway", "gateway_timeout", "forwarded"]`, `upstream_status: int | None`, `upstream_message: str | None`
@@ -83,13 +84,13 @@ git pull origin main
   - [x] 2.6.5 Malformed JSON raises `UpstreamError("bad_gateway")`
   - [x] 2.6.6 Filter translation is visible in the upstream URL
 - [x] 2.7 `uv run ruff check`, `uv run ruff format --check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` all pass
-- [x] 2.8 Commit, push, open PR, merge with branch deletion, pull main
+- [x] 2.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 3. Capability: `app-foundation`
+## 3. Capability: `app-foundation` (foundation — must merge before any endpoint capability)
 
-> Branch: `feat/app-foundation`. Start from `main` after section 2 merges.
+> Worktree: `../lapwise-app-foundation`, branch: `feat/app-foundation`. Start AFTER section 2 merges.
 
 - [x] 3.1 Create `src/lapwise/models/common.py`:
   - [x] 3.1.1 `ErrorEnvelope` Pydantic model: `detail: str`, `upstream_status: int | None`, `upstream_message: str | None`
@@ -117,34 +118,34 @@ git pull origin main
   - [x] 3.6.4 An `UpstreamError("gateway_timeout", ...)` is rendered as 504
   - [x] 3.6.5 An `UpstreamError("forwarded", upstream_status=404, ...)` is rendered as 404
 - [x] 3.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
-- [x] 3.8 Commit, push, open PR, merge with branch deletion, pull main
+- [x] 3.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 4. Capability: `endpoint-drivers`
+## 4. Capability: `endpoint-drivers` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-drivers`. Start from `main` after section 3 merges.
+> Worktree: `../lapwise-endpoint-drivers`, branch: `feat/endpoint-drivers`.
 
-- [x] 4.1 Create `src/lapwise/models/drivers.py` defining `Driver` (fields per spec)
-- [x] 4.2 Create `src/lapwise/services/drivers.py` defining `DriverService.list_drivers(**filters) -> list[Driver]`
-- [x] 4.3 Add `get_driver_service` provider in `src/lapwise/deps.py`
-- [x] 4.4 Create `src/lapwise/routes/v1/drivers.py`:
-  - [x] 4.4.1 `GET /drivers` returning `list[Driver]`
-  - [x] 4.4.2 Typed query params: `driver_number: list[int] | None`, `session_key: int | str | None`, `meeting_key: int | str | None`, plus other OpenF1-documented equality fields
-  - [x] 4.4.3 `summary`, multi-paragraph `description` linking to OpenF1 docs, per-`Query` descriptions/examples
-  - [x] 4.4.4 `responses` dict with examples for 200/422/502/504
-- [x] 4.5 Register `routes/v1/drivers.router` in `routes/v1/__init__.py`
-- [x] 4.6 Unit tests:
-  - [x] 4.6.1 `tests/unit/test_services_drivers.py` — service forwards filters and returns parsed list (client mocked)
-  - [x] 4.6.2 `tests/unit/test_routes_drivers.py` — TestClient with mocked service: equality filter, repeated `driver_number` becomes list[int], 502 path
-- [x] 4.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
-- [ ] 4.8 Commit, push, open PR, merge with branch deletion, pull main
+- [ ] 4.1 Create `src/lapwise/models/drivers.py` defining `Driver` (fields per spec)
+- [ ] 4.2 Create `src/lapwise/services/drivers.py` defining `DriverService.list_drivers(**filters) -> list[Driver]`
+- [ ] 4.3 Add `get_driver_service` provider in `src/lapwise/deps.py`
+- [ ] 4.4 Create `src/lapwise/routes/v1/drivers.py`:
+  - [ ] 4.4.1 `GET /drivers` returning `list[Driver]`
+  - [ ] 4.4.2 Typed query params: `driver_number: list[int] | None`, `session_key: int | str | None`, `meeting_key: int | str | None`, plus other OpenF1-documented equality fields
+  - [ ] 4.4.3 `summary`, multi-paragraph `description` linking to OpenF1 docs, per-`Query` descriptions/examples
+  - [ ] 4.4.4 `responses` dict with examples for 200/422/502/504
+- [ ] 4.5 Register `routes/v1/drivers.router` in `routes/v1/__init__.py`
+- [ ] 4.6 Unit tests:
+  - [ ] 4.6.1 `tests/unit/test_services_drivers.py` — service forwards filters and returns parsed list (client mocked)
+  - [ ] 4.6.2 `tests/unit/test_routes_drivers.py` — TestClient with mocked service: equality filter, repeated `driver_number` becomes list[int], 502 path
+- [ ] 4.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
+- [ ] 4.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 5. Capability: `endpoint-laps`
+## 5. Capability: `endpoint-laps` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-laps`. Start from `main` after section 4 merges.
+> Worktree: `../lapwise-endpoint-laps`, branch: `feat/endpoint-laps`.
 
 - [ ] 5.1 Create `src/lapwise/models/laps.py` defining `Lap` (fields per spec)
 - [ ] 5.2 Create `src/lapwise/services/laps.py` defining `LapService.list_laps(**filters) -> list[Lap]`
@@ -159,13 +160,13 @@ git pull origin main
   - [ ] 5.6.1 `tests/unit/test_services_laps.py` — service forwards filters
   - [ ] 5.6.2 `tests/unit/test_routes_laps.py` — equality and comparison suffix filters; verify the upstream URL captured by the mocked client contains `lap_duration<...`
 - [ ] 5.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
-- [ ] 5.8 Commit, push, open PR, merge with branch deletion, pull main
+- [ ] 5.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 6. Capability: `endpoint-meetings`
+## 6. Capability: `endpoint-meetings` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-meetings`. Start from `main` after section 5 merges.
+> Worktree: `../lapwise-endpoint-meetings`, branch: `feat/endpoint-meetings`.
 
 - [ ] 6.1 Create `src/lapwise/models/meetings.py` defining `Meeting` (fields per spec)
 - [ ] 6.2 Create `src/lapwise/services/meetings.py` defining `MeetingService.list_meetings(**filters) -> list[Meeting]`
@@ -177,28 +178,28 @@ git pull origin main
 - [ ] 6.5 Register `routes/v1/meetings.router` in `routes/v1/__init__.py`
 - [ ] 6.6 Unit tests for service and route, including the `latest` literal pass-through
 - [ ] 6.7 Lint, type-check, tests pass
-- [ ] 6.8 Commit, push, open PR, merge with branch deletion, pull main
+- [ ] 6.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 7. Capability: `endpoint-sessions`
+## 7. Capability: `endpoint-sessions` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-sessions`. Start from `main` after section 6 merges.
+> Worktree: `../lapwise-endpoint-sessions`, branch: `feat/endpoint-sessions`.
 
-- [x] 7.1 Create `src/lapwise/models/sessions.py` defining `Session`
-- [x] 7.2 Create `src/lapwise/services/sessions.py` defining `SessionService.list_sessions`
-- [x] 7.3 Add `get_session_service` provider in `src/lapwise/deps.py`
-- [x] 7.4 Create `src/lapwise/routes/v1/sessions.py` with `GET /sessions`, `session_key: int | Literal["latest"] | None`, `meeting_key`, `country_name`, `session_name`, `session_type`, `year`, plus rich OpenAPI metadata
-- [x] 7.5 Register router
-- [x] 7.6 Unit tests for service and route incl. `latest` pass-through
-- [x] 7.7 Lint, type-check, tests pass
-- [x] 7.8 Commit, push, open PR, merge with branch deletion, pull main
+- [ ] 7.1 Create `src/lapwise/models/sessions.py` defining `Session`
+- [ ] 7.2 Create `src/lapwise/services/sessions.py` defining `SessionService.list_sessions`
+- [ ] 7.3 Add `get_session_service` provider in `src/lapwise/deps.py`
+- [ ] 7.4 Create `src/lapwise/routes/v1/sessions.py` with `GET /sessions`, `session_key: int | Literal["latest"] | None`, `meeting_key`, `country_name`, `session_name`, `session_type`, `year`, plus rich OpenAPI metadata
+- [ ] 7.5 Register router
+- [ ] 7.6 Unit tests for service and route incl. `latest` pass-through
+- [ ] 7.7 Lint, type-check, tests pass
+- [ ] 7.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 8. Capability: `endpoint-session-result`
+## 8. Capability: `endpoint-session-result` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-session-result`. Start from `main` after section 7 merges.
+> Worktree: `../lapwise-endpoint-session-result`, branch: `feat/endpoint-session-result`.
 
 - [ ] 8.1 Create `src/lapwise/models/session_result.py` defining `SessionResult` with Union types for `duration` and `gap_to_leader`
 - [ ] 8.2 Create `src/lapwise/services/session_result.py` defining `SessionResultService.list_results`
@@ -207,13 +208,13 @@ git pull origin main
 - [ ] 8.5 Register router
 - [ ] 8.6 Unit tests for service and route incl. `position_lte` translating to `position<=3`
 - [ ] 8.7 Lint, type-check, tests pass
-- [ ] 8.8 Commit, push, open PR, merge with branch deletion, pull main
+- [ ] 8.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 9. Capability: `endpoint-pit`
+## 9. Capability: `endpoint-pit` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-pit`. Start from `main` after section 8 merges.
+> Worktree: `../lapwise-endpoint-pit`, branch: `feat/endpoint-pit`.
 
 - [ ] 9.1 Create `src/lapwise/models/pit.py` defining `PitStop`
 - [ ] 9.2 Create `src/lapwise/services/pit.py` defining `PitService.list_pit_stops`
@@ -222,28 +223,28 @@ git pull origin main
 - [ ] 9.5 Register router
 - [ ] 9.6 Unit tests for service and route incl. `stop_duration_lt` translation
 - [ ] 9.7 Lint, type-check, tests pass
-- [ ] 9.8 Commit, push, open PR, merge with branch deletion, pull main
+- [ ] 9.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 10. Capability: `endpoint-position`
+## 10. Capability: `endpoint-position` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-position`. Start from `main` after section 9 merges.
+> Worktree: `../lapwise-endpoint-position`, branch: `feat/endpoint-position`.
 
-- [ ] 10.1 Create `src/lapwise/models/position.py` defining `Position`
-- [ ] 10.2 Create `src/lapwise/services/position.py` defining `PositionService.list_positions`
-- [ ] 10.3 Add `get_position_service` provider in `src/lapwise/deps.py`
-- [ ] 10.4 Create `src/lapwise/routes/v1/position.py` with `GET /position`, params: `session_key`, `meeting_key`, `driver_number: list[int] | None`, `position`, `position_lt`, `position_lte`, `position_gt`, `position_gte`. Rich OpenAPI metadata
-- [ ] 10.5 Register router
-- [ ] 10.6 Unit tests for service and route incl. `position_lte` translation
-- [ ] 10.7 Lint, type-check, tests pass
-- [ ] 10.8 Commit, push, open PR, merge with branch deletion, pull main
+- [x] 10.1 Create `src/lapwise/models/position.py` defining `Position`
+- [x] 10.2 Create `src/lapwise/services/position.py` defining `PositionService.list_positions`
+- [x] 10.3 Add `get_position_service` provider in `src/lapwise/deps.py`
+- [x] 10.4 Create `src/lapwise/routes/v1/position.py` with `GET /position`, params: `session_key`, `meeting_key`, `driver_number: list[int] | None`, `position`, `position_lt`, `position_lte`, `position_gt`, `position_gte`. Rich OpenAPI metadata
+- [x] 10.5 Register router
+- [x] 10.6 Unit tests for service and route incl. `position_lte` translation
+- [x] 10.7 Lint, type-check, tests pass
+- [ ] 10.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 11. Capability: `endpoint-overtakes`
+## 11. Capability: `endpoint-overtakes` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-overtakes`. Start from `main` after section 10 merges.
+> Worktree: `../lapwise-endpoint-overtakes`, branch: `feat/endpoint-overtakes`.
 
 - [ ] 11.1 Create `src/lapwise/models/overtakes.py` defining `Overtake`
 - [ ] 11.2 Create `src/lapwise/services/overtakes.py` defining `OvertakeService.list_overtakes`
@@ -252,13 +253,13 @@ git pull origin main
 - [ ] 11.5 Register router
 - [ ] 11.6 Unit tests for service and route
 - [ ] 11.7 Lint, type-check, tests pass
-- [ ] 11.8 Commit, push, open PR, merge with branch deletion, pull main
+- [ ] 11.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 12. Capability: `endpoint-stints`
+## 12. Capability: `endpoint-stints` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-stints`. Start from `main` after section 11 merges.
+> Worktree: `../lapwise-endpoint-stints`, branch: `feat/endpoint-stints`.
 
 - [ ] 12.1 Create `src/lapwise/models/stints.py` defining `Stint`
 - [ ] 12.2 Create `src/lapwise/services/stints.py` defining `StintService.list_stints`
@@ -267,13 +268,13 @@ git pull origin main
 - [ ] 12.5 Register router
 - [ ] 12.6 Unit tests for service and route incl. `tyre_age_at_start_gte` translation
 - [ ] 12.7 Lint, type-check, tests pass
-- [ ] 12.8 Commit, push, open PR, merge with branch deletion, pull main
+- [ ] 12.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 13. Capability: `endpoint-starting-grid`
+## 13. Capability: `endpoint-starting-grid` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-starting-grid`. Start from `main` after section 12 merges.
+> Worktree: `../lapwise-endpoint-starting-grid`, branch: `feat/endpoint-starting-grid`.
 
 - [ ] 13.1 Create `src/lapwise/models/starting_grid.py` defining `StartingGridEntry`
 - [ ] 13.2 Create `src/lapwise/services/starting_grid.py` defining `StartingGridService.list_grid`
@@ -282,13 +283,13 @@ git pull origin main
 - [ ] 13.5 Register router
 - [ ] 13.6 Unit tests for service and route incl. `position_lte` translation
 - [ ] 13.7 Lint, type-check, tests pass
-- [ ] 13.8 Commit, push, open PR, merge with branch deletion, pull main
+- [ ] 13.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 14. Capability: `endpoint-weather`
+## 14. Capability: `endpoint-weather` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-weather`. Start from `main` after section 13 merges.
+> Worktree: `../lapwise-endpoint-weather`, branch: `feat/endpoint-weather`.
 
 - [ ] 14.1 Create `src/lapwise/models/weather.py` defining `Weather`
 - [ ] 14.2 Create `src/lapwise/services/weather.py` defining `WeatherService.list_weather`
@@ -297,13 +298,13 @@ git pull origin main
 - [ ] 14.5 Register router
 - [ ] 14.6 Unit tests for service and route incl. multiple `_gte` filters translated together
 - [ ] 14.7 Lint, type-check, tests pass
-- [ ] 14.8 Commit, push, open PR, merge with branch deletion, pull main
+- [ ] 14.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 15. Capability: `endpoint-championship-drivers`
+## 15. Capability: `endpoint-championship-drivers` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-championship-drivers`. Start from `main` after section 14 merges.
+> Worktree: `../lapwise-endpoint-championship-drivers`, branch: `feat/endpoint-championship-drivers`.
 
 - [ ] 15.1 Create or extend `src/lapwise/models/championship.py` defining `ChampionshipDriver`
 - [ ] 15.2 Create `src/lapwise/services/championship.py` (or extend) defining `ChampionshipDriverService.list_standings`
@@ -312,13 +313,13 @@ git pull origin main
 - [ ] 15.5 Register router
 - [ ] 15.6 Unit tests for service and route incl. repeated `driver_number`
 - [ ] 15.7 Lint, type-check, tests pass
-- [ ] 15.8 Commit, push, open PR, merge with branch deletion, pull main
+- [ ] 15.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 16. Capability: `endpoint-championship-teams`
+## 16. Capability: `endpoint-championship-teams` (parallel — start after section 3 merges)
 
-> Branch: `feat/endpoint-championship-teams`. Start from `main` after section 15 merges.
+> Worktree: `../lapwise-endpoint-championship-teams`, branch: `feat/endpoint-championship-teams`.
 
 - [ ] 16.1 Create or extend `src/lapwise/models/championship.py` defining `ChampionshipTeam`
 - [ ] 16.2 Create or extend `src/lapwise/services/championship.py` defining `ChampionshipTeamService.list_standings`
@@ -327,11 +328,11 @@ git pull origin main
 - [ ] 16.5 Register router
 - [ ] 16.6 Unit tests for service and route
 - [ ] 16.7 Lint, type-check, tests pass
-- [ ] 16.8 Commit, push, open PR, merge with branch deletion, pull main
+- [ ] 16.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
-## 17. Final integration check (run on `main` after all endpoint capabilities merge)
+## 17. Final integration check (sequential — run on `main` after all endpoint capabilities merge)
 
 - [ ] 17.1 Pull `main` locally
 - [ ] 17.2 `uv sync`
