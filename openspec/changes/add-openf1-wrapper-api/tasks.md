@@ -92,33 +92,33 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-app-foundation`, branch: `feat/app-foundation`. Start AFTER section 2 merges.
 
-- [ ] 3.1 Create `src/lapwise/models/common.py`:
-  - [ ] 3.1.1 `ErrorEnvelope` Pydantic model: `detail: str`, `upstream_status: int | None`, `upstream_message: str | None`
-  - [ ] 3.1.2 Document each field with `Field(description=...)`
-- [ ] 3.2 Create `src/lapwise/deps.py`:
-  - [ ] 3.2.1 `get_openf1_client(request: Request) -> OpenF1Client` returning `request.app.state.openf1_client`
-  - [ ] 3.2.2 `async def get_auth() -> None` (no-op slot)
-  - [ ] 3.2.3 Placeholder service-provider helpers wired in subsequent endpoint capabilities — leave file commented or empty stub
-- [ ] 3.3 Create `src/lapwise/routes/v1/__init__.py`:
-  - [ ] 3.3.1 `router = APIRouter(prefix="/v1", tags=["OpenF1 wrappers"], dependencies=[Depends(get_auth)])`
-- [ ] 3.4 Create `src/lapwise/routes/analysis/__init__.py`:
-  - [ ] 3.4.1 `router = APIRouter(prefix="/v1/analysis", tags=["Analysis"], dependencies=[Depends(get_auth)])` (zero routes for now)
-- [ ] 3.5 Create `src/lapwise/main.py`:
-  - [ ] 3.5.1 `lifespan` context manager that creates `OpenF1Client(get_settings())`, sets on `app.state.openf1_client`, awaits `aclose()` on shutdown
-  - [ ] 3.5.2 `create_app()` factory: instantiate `FastAPI(title="Lapwise — OpenF1 Wrapper API", description="...mentions wraps OpenF1 historical tier...", version="0.1.0", lifespan=lifespan, openapi_tags=[...])`
-  - [ ] 3.5.3 Register `GET /healthz` returning `{"status": "ok"}` (does not touch the client)
-  - [ ] 3.5.4 Include the v1 router and analysis router
-  - [ ] 3.5.5 Register exception handler for `UpstreamError` translating to `502`/`504`/forwarded status with `ErrorEnvelope` body
-  - [ ] 3.5.6 Configure `openapi_tags` metadata (`OpenF1 wrappers`, `Analysis`) with descriptions
-  - [ ] 3.5.7 Module-level `app = create_app()`
-- [ ] 3.6 Unit tests `tests/unit/test_app_foundation.py`:
-  - [ ] 3.6.1 `GET /healthz` returns 200 `{"status": "ok"}`
-  - [ ] 3.6.2 OpenAPI schema contains `OpenF1 wrappers` and `Analysis` tags
-  - [ ] 3.6.3 An `UpstreamError("bad_gateway", upstream_status=503, ...)` raised by a test route is rendered as 502 with `ErrorEnvelope` body
-  - [ ] 3.6.4 An `UpstreamError("gateway_timeout", ...)` is rendered as 504
-  - [ ] 3.6.5 An `UpstreamError("forwarded", upstream_status=404, ...)` is rendered as 404
-- [ ] 3.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
-- [ ] 3.8 Commit, push, open PR, merge with branch deletion
+- [x] 3.1 Create `src/lapwise/models/common.py`:
+  - [x] 3.1.1 `ErrorEnvelope` Pydantic model: `detail: str`, `upstream_status: int | None`, `upstream_message: str | None`
+  - [x] 3.1.2 Document each field with `Field(description=...)`
+- [x] 3.2 Create `src/lapwise/deps.py`:
+  - [x] 3.2.1 `get_openf1_client(request: Request) -> OpenF1Client` returning `request.app.state.openf1_client`
+  - [x] 3.2.2 `async def get_auth() -> None` (no-op slot)
+  - [x] 3.2.3 Placeholder service-provider helpers wired in subsequent endpoint capabilities — leave file commented or empty stub
+- [x] 3.3 Create `src/lapwise/routes/v1/__init__.py`:
+  - [x] 3.3.1 `router = APIRouter(prefix="/v1", tags=["OpenF1 wrappers"], dependencies=[Depends(get_auth)])`
+- [x] 3.4 Create `src/lapwise/routes/analysis/__init__.py`:
+  - [x] 3.4.1 `router = APIRouter(prefix="/v1/analysis", tags=["Analysis"], dependencies=[Depends(get_auth)])` (zero routes for now)
+- [x] 3.5 Create `src/lapwise/main.py`:
+  - [x] 3.5.1 `lifespan` context manager that creates `OpenF1Client(get_settings())`, sets on `app.state.openf1_client`, awaits `aclose()` on shutdown
+  - [x] 3.5.2 `create_app()` factory: instantiate `FastAPI(title="Lapwise — OpenF1 Wrapper API", description="...mentions wraps OpenF1 historical tier...", version="0.1.0", lifespan=lifespan, openapi_tags=[...])`
+  - [x] 3.5.3 Register `GET /healthz` returning `{"status": "ok"}` (does not touch the client)
+  - [x] 3.5.4 Include the v1 router and analysis router
+  - [x] 3.5.5 Register exception handler for `UpstreamError` translating to `502`/`504`/forwarded status with `ErrorEnvelope` body
+  - [x] 3.5.6 Configure `openapi_tags` metadata (`OpenF1 wrappers`, `Analysis`) with descriptions
+  - [x] 3.5.7 Module-level `app = create_app()`
+- [x] 3.6 Unit tests `tests/unit/test_app_foundation.py`:
+  - [x] 3.6.1 `GET /healthz` returns 200 `{"status": "ok"}`
+  - [x] 3.6.2 OpenAPI schema contains `OpenF1 wrappers` and `Analysis` tags
+  - [x] 3.6.3 An `UpstreamError("bad_gateway", upstream_status=503, ...)` raised by a test route is rendered as 502 with `ErrorEnvelope` body
+  - [x] 3.6.4 An `UpstreamError("gateway_timeout", ...)` is rendered as 504
+  - [x] 3.6.5 An `UpstreamError("forwarded", upstream_status=404, ...)` is rendered as 404
+- [x] 3.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
+- [x] 3.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
