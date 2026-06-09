@@ -5,11 +5,12 @@
 ```bash
 # 1. From repo root, create a worktree off main
 git worktree add ../lapwise-<capability> -b feat/<capability>
-cd ../lapwise-<capability>
+cd ../lapwise-<capability>/service   # all uv commands run from service/
 
 # 2. Implement the tasks in this section
 # 3. Tick each task box (- [ ] → - [x]) as you complete it in tasks.md
-# 4. Commit
+# 4. Commit (from repo root of the worktree)
+cd ..
 git add -A
 git commit -m "feat(<capability>): <summary>"
 

@@ -137,60 +137,62 @@ FastAPI handles sync handlers in a thread pool, but async-throughout means we av
 
 ```
 lapwise/
-  pyproject.toml          (uv-managed, Python 3.12)
-  uv.lock
-  .python-version         (3.12)
-  README.md
-  src/lapwise/
-    __init__.py
-    main.py               (FastAPI app, OpenAPI metadata, lifespan, router registration)
-    config.py             (Settings via pydantic-settings)
-    deps.py               (DI providers: client, services, auth slot)
-    clients/
+  .gitignore
+  service/                  (all backend code — run uv commands from here)
+    pyproject.toml          (uv-managed, Python 3.12)
+    uv.lock
+    .python-version         (3.12)
+    README.md
+    src/lapwise/
       __init__.py
-      openf1.py           (OpenF1Client)
-      filters.py          (hybrid filter → OpenF1 query-string translator)
-      errors.py           (UpstreamError, mapping helpers)
-    models/
-      __init__.py
-      common.py           (ErrorEnvelope, shared types)
-      drivers.py          (Driver)
-      laps.py             (Lap)
-      meetings.py         (Meeting)
-      sessions.py         (Session)
-      session_result.py   (SessionResult)
-      pit.py              (PitStop)
-      position.py         (Position)
-      overtakes.py        (Overtake)
-      stints.py           (Stint)
-      starting_grid.py    (StartingGridEntry)
-      weather.py          (Weather)
-      championship.py     (ChampionshipDriver, ChampionshipTeam)
-    services/
-      __init__.py
-      base.py             (BaseService — shared protocol/helpers)
-      drivers.py, laps.py, meetings.py, sessions.py, session_result.py,
-      pit.py, position.py, overtakes.py, stints.py, starting_grid.py,
-      weather.py, championship.py
-    routes/
-      __init__.py
-      v1/
-        __init__.py       (APIRouter prefix="/v1", tags=["OpenF1 wrappers"])
+      main.py               (FastAPI app, OpenAPI metadata, lifespan, router registration)
+      config.py             (Settings via pydantic-settings)
+      deps.py               (DI providers: client, services, auth slot)
+      clients/
+        __init__.py
+        openf1.py           (OpenF1Client)
+        filters.py          (hybrid filter → OpenF1 query-string translator)
+        errors.py           (UpstreamError, mapping helpers)
+      models/
+        __init__.py
+        common.py           (ErrorEnvelope, shared types)
+        drivers.py          (Driver)
+        laps.py             (Lap)
+        meetings.py         (Meeting)
+        sessions.py         (Session)
+        session_result.py   (SessionResult)
+        pit.py              (PitStop)
+        position.py         (Position)
+        overtakes.py        (Overtake)
+        stints.py           (Stint)
+        starting_grid.py    (StartingGridEntry)
+        weather.py          (Weather)
+        championship.py     (ChampionshipDriver, ChampionshipTeam)
+      services/
+        __init__.py
+        base.py             (BaseService — shared protocol/helpers)
         drivers.py, laps.py, meetings.py, sessions.py, session_result.py,
         pit.py, position.py, overtakes.py, stints.py, starting_grid.py,
-        weather.py, championship_drivers.py, championship_teams.py
-      analysis/
-        __init__.py       (APIRouter prefix="/v1/analysis", tags=["Analysis"])
-                          (no endpoints in this change — slot for future work)
-  tests/
-    __init__.py
-    conftest.py           (shared fixtures: mocked client, app, TestClient)
-    unit/
-      test_clients_openf1.py
-      test_filters.py
-      test_errors.py
-      test_services_<resource>.py     (one per resource)
-      test_routes_<resource>.py       (one per resource)
+        weather.py, championship.py
+      routes/
+        __init__.py
+        v1/
+          __init__.py       (APIRouter prefix="/v1", tags=["OpenF1 wrappers"])
+          drivers.py, laps.py, meetings.py, sessions.py, session_result.py,
+          pit.py, position.py, overtakes.py, stints.py, starting_grid.py,
+          weather.py, championship_drivers.py, championship_teams.py
+        analysis/
+          __init__.py       (APIRouter prefix="/v1/analysis", tags=["Analysis"])
+                            (no endpoints in this change — slot for future work)
+    tests/
+      __init__.py
+      conftest.py           (shared fixtures: mocked client, app, TestClient)
+      unit/
+        test_clients_openf1.py
+        test_filters.py
+        test_errors.py
+        test_services_<resource>.py     (one per resource)
+        test_routes_<resource>.py       (one per resource)
 ```
 
 ### D9. Tooling
@@ -199,8 +201,9 @@ lapwise/
 - **Runtime deps**: `fastapi`, `uvicorn[standard]`, `httpx`, `pydantic` (v2), `pydantic-settings`.
 - **Dev deps**: `pytest`, `pytest-asyncio`, `respx` (mocks `httpx`), `ruff` (lint + format), `mypy`.
 - **Lint/format**: `ruff check` + `ruff format`.
-- **Type check**: `mypy src/lapwise --strict` (best effort; relax per-module if needed).
-- **Test**: `pytest tests/unit -q`.
+- **Working directory**: all `uv run` commands execute from `service/`.
+- **Type check**: `uv run mypy src/lapwise --strict` (best effort; relax per-module if needed).
+- **Test**: `uv run pytest tests/unit -q`.
 
 ### D10. Parallel implementation workflow
 
