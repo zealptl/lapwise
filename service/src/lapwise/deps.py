@@ -9,6 +9,7 @@ from typing import Annotated
 from fastapi import Depends, Request
 
 from lapwise.clients.openf1 import OpenF1Client
+from lapwise.services.championship import ChampionshipDriverService, ChampionshipTeamService
 from lapwise.services.drivers import DriverService
 from lapwise.services.laps import LapService
 from lapwise.services.meetings import MeetingService
@@ -117,3 +118,17 @@ def get_weather_service(
 ) -> WeatherService:
     """Return a WeatherService for the current request."""
     return WeatherService(client)
+
+
+def get_championship_driver_service(
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+) -> ChampionshipDriverService:
+    """Return a ChampionshipDriverService for the current request."""
+    return ChampionshipDriverService(client)
+
+
+def get_championship_team_service(
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+) -> ChampionshipTeamService:
+    """Return a ChampionshipTeamService for the current request."""
+    return ChampionshipTeamService(client)
