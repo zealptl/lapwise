@@ -238,7 +238,7 @@ git worktree remove ../lapwise-<capability>
 - [x] 10.5 Register router
 - [x] 10.6 Unit tests for service and route incl. `position_lte` translation
 - [x] 10.7 Lint, type-check, tests pass
-- [ ] 10.8 Commit, push, open PR, merge with branch deletion
+- [x] 10.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
