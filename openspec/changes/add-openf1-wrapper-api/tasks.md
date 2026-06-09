@@ -168,16 +168,16 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-endpoint-meetings`, branch: `feat/endpoint-meetings`.
 
-- [ ] 6.1 Create `src/lapwise/models/meetings.py` defining `Meeting` (fields per spec)
-- [ ] 6.2 Create `src/lapwise/services/meetings.py` defining `MeetingService.list_meetings(**filters) -> list[Meeting]`
-- [ ] 6.3 Add `get_meeting_service` provider in `src/lapwise/deps.py`
-- [ ] 6.4 Create `src/lapwise/routes/v1/meetings.py`:
-  - [ ] 6.4.1 `GET /meetings` returning `list[Meeting]`
-  - [ ] 6.4.2 Typed query params including `meeting_key: int | Literal["latest"] | None`, `year`, `country_name`, `circuit_short_name`, `location`
-  - [ ] 6.4.3 Rich OpenAPI metadata + responses examples
-- [ ] 6.5 Register `routes/v1/meetings.router` in `routes/v1/__init__.py`
-- [ ] 6.6 Unit tests for service and route, including the `latest` literal pass-through
-- [ ] 6.7 Lint, type-check, tests pass
+- [x] 6.1 Create `src/lapwise/models/meetings.py` defining `Meeting` (fields per spec)
+- [x] 6.2 Create `src/lapwise/services/meetings.py` defining `MeetingService.list_meetings(**filters) -> list[Meeting]`
+- [x] 6.3 Add `get_meeting_service` provider in `src/lapwise/deps.py`
+- [x] 6.4 Create `src/lapwise/routes/v1/meetings.py`:
+  - [x] 6.4.1 `GET /meetings` returning `list[Meeting]`
+  - [x] 6.4.2 Typed query params including `meeting_key: int | Literal["latest"] | None`, `year`, `country_name`, `circuit_short_name`, `location`
+  - [x] 6.4.3 Rich OpenAPI metadata + responses examples
+- [x] 6.5 Register `routes/v1/meetings.router` in `routes/v1/__init__.py`
+- [x] 6.6 Unit tests for service and route, including the `latest` literal pass-through
+- [x] 6.7 Lint, type-check, tests pass
 - [ ] 6.8 Commit, push, open PR, merge with branch deletion
 
 ---

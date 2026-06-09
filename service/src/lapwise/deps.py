@@ -11,6 +11,7 @@ from fastapi import Depends, Request
 from lapwise.clients.openf1 import OpenF1Client
 from lapwise.services.drivers import DriverService
 from lapwise.services.laps import LapService
+from lapwise.services.meetings import MeetingService
 from lapwise.services.position import PositionService
 from lapwise.services.sessions import SessionService
 
@@ -54,6 +55,13 @@ def get_lap_service(
 ) -> LapService:
     """Return a LapService for the current request."""
     return LapService(client)
+
+
+def get_meeting_service(
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+) -> MeetingService:
+    """Return a MeetingService for the current request."""
+    return MeetingService(client)
 
 
 def get_position_service(
