@@ -178,7 +178,7 @@ git worktree remove ../lapwise-<capability>
 - [x] 6.5 Register `routes/v1/meetings.router` in `routes/v1/__init__.py`
 - [x] 6.6 Unit tests for service and route, including the `latest` literal pass-through
 - [x] 6.7 Lint, type-check, tests pass
-- [ ] 6.8 Commit, push, open PR, merge with branch deletion
+- [x] 6.8 Commit, push, open PR, merge with branch deletion
 
 ---
 
@@ -201,13 +201,13 @@ git worktree remove ../lapwise-<capability>
 
 > Worktree: `../lapwise-endpoint-session-result`, branch: `feat/endpoint-session-result`.
 
-- [ ] 8.1 Create `src/lapwise/models/session_result.py` defining `SessionResult` with Union types for `duration` and `gap_to_leader`
-- [ ] 8.2 Create `src/lapwise/services/session_result.py` defining `SessionResultService.list_results`
-- [ ] 8.3 Add `get_session_result_service` provider in `src/lapwise/deps.py`
-- [ ] 8.4 Create `src/lapwise/routes/v1/session_result.py` with `GET /session_result`, params: `session_key`, `meeting_key`, `driver_number: list[int] | None`, `position`, `position_lt`, `position_lte`, `position_gt`, `position_gte`, `dnf`, `dns`, `dsq`. Rich OpenAPI metadata with a `200` example whose row uses the array form of `duration`
-- [ ] 8.5 Register router
-- [ ] 8.6 Unit tests for service and route incl. `position_lte` translating to `position<=3`
-- [ ] 8.7 Lint, type-check, tests pass
+- [x] 8.1 Create `src/lapwise/models/session_result.py` defining `SessionResult` with Union types for `duration` and `gap_to_leader`
+- [x] 8.2 Create `src/lapwise/services/session_result.py` defining `SessionResultService.list_results`
+- [x] 8.3 Add `get_session_result_service` provider in `src/lapwise/deps.py`
+- [x] 8.4 Create `src/lapwise/routes/v1/session_result.py` with `GET /session_result`, params: `session_key`, `meeting_key`, `driver_number: list[int] | None`, `position`, `position_lt`, `position_lte`, `position_gt`, `position_gte`, `dnf`, `dns`, `dsq`. Rich OpenAPI metadata with a `200` example whose row uses the array form of `duration`
+- [x] 8.5 Register router
+- [x] 8.6 Unit tests for service and route incl. `position_lte` translating to `position<=3`
+- [x] 8.7 Lint, type-check, tests pass
 - [ ] 8.8 Commit, push, open PR, merge with branch deletion
 
 ---

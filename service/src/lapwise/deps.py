@@ -13,6 +13,7 @@ from lapwise.services.drivers import DriverService
 from lapwise.services.laps import LapService
 from lapwise.services.meetings import MeetingService
 from lapwise.services.position import PositionService
+from lapwise.services.session_result import SessionResultService
 from lapwise.services.sessions import SessionService
 
 
@@ -55,6 +56,13 @@ def get_lap_service(
 ) -> LapService:
     """Return a LapService for the current request."""
     return LapService(client)
+
+
+def get_session_result_service(
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+) -> SessionResultService:
+    """Return a SessionResultService for the current request."""
+    return SessionResultService(client)
 
 
 def get_meeting_service(
