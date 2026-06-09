@@ -138,7 +138,7 @@ git pull origin main
   - [x] 4.6.1 `tests/unit/test_services_drivers.py` — service forwards filters and returns parsed list (client mocked)
   - [x] 4.6.2 `tests/unit/test_routes_drivers.py` — TestClient with mocked service: equality filter, repeated `driver_number` becomes list[int], 502 path
 - [x] 4.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
-- [ ] 4.8 Commit, push, open PR, merge with branch deletion, pull main
+- [x] 4.8 Commit, push, open PR, merge with branch deletion, pull main
 
 ---
 
@@ -146,19 +146,19 @@ git pull origin main
 
 > Branch: `feat/endpoint-laps`. Start from `main` after section 4 merges.
 
-- [ ] 5.1 Create `src/lapwise/models/laps.py` defining `Lap` (fields per spec)
-- [ ] 5.2 Create `src/lapwise/services/laps.py` defining `LapService.list_laps(**filters) -> list[Lap]`
-- [ ] 5.3 Add `get_lap_service` provider in `src/lapwise/deps.py`
-- [ ] 5.4 Create `src/lapwise/routes/v1/laps.py`:
-  - [ ] 5.4.1 `GET /laps` returning `list[Lap]`
-  - [ ] 5.4.2 Typed query params including comparison suffixes: `lap_duration_lt`, `lap_duration_lte`, `lap_duration_gt`, `lap_duration_gte`, `lap_number`, `driver_number: list[int] | None`, `session_key`, `meeting_key`, `is_pit_out_lap`
-  - [ ] 5.4.3 Rich OpenAPI metadata (summary, description with OpenF1 link, param descriptions, examples)
-  - [ ] 5.4.4 `responses` dict with examples for 200/422/502/504
-- [ ] 5.5 Register `routes/v1/laps.router` in `routes/v1/__init__.py`
-- [ ] 5.6 Unit tests:
-  - [ ] 5.6.1 `tests/unit/test_services_laps.py` — service forwards filters
-  - [ ] 5.6.2 `tests/unit/test_routes_laps.py` — equality and comparison suffix filters; verify the upstream URL captured by the mocked client contains `lap_duration<...`
-- [ ] 5.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
+- [x] 5.1 Create `src/lapwise/models/laps.py` defining `Lap` (fields per spec)
+- [x] 5.2 Create `src/lapwise/services/laps.py` defining `LapService.list_laps(**filters) -> list[Lap]`
+- [x] 5.3 Add `get_lap_service` provider in `src/lapwise/deps.py`
+- [x] 5.4 Create `src/lapwise/routes/v1/laps.py`:
+  - [x] 5.4.1 `GET /laps` returning `list[Lap]`
+  - [x] 5.4.2 Typed query params including comparison suffixes: `lap_duration_lt`, `lap_duration_lte`, `lap_duration_gt`, `lap_duration_gte`, `lap_number`, `driver_number: list[int] | None`, `session_key`, `meeting_key`, `is_pit_out_lap`
+  - [x] 5.4.3 Rich OpenAPI metadata (summary, description with OpenF1 link, param descriptions, examples)
+  - [x] 5.4.4 `responses` dict with examples for 200/422/502/504
+- [x] 5.5 Register `routes/v1/laps.router` in `routes/v1/__init__.py`
+- [x] 5.6 Unit tests:
+  - [x] 5.6.1 `tests/unit/test_services_laps.py` — service forwards filters
+  - [x] 5.6.2 `tests/unit/test_routes_laps.py` — equality and comparison suffix filters; verify the upstream URL captured by the mocked client contains `lap_duration<...`
+- [x] 5.7 `uv run ruff check`, `uv run mypy src/lapwise`, `uv run pytest tests/unit -q` pass
 - [ ] 5.8 Commit, push, open PR, merge with branch deletion, pull main
 
 ---
