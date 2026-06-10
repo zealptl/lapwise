@@ -37,10 +37,10 @@
 
 ## 5. Fastest Lap Candidates Service + Route
 
-- [ ] 5.1 Implement `service/src/lapwise/services/analysis/fastest_lap.py` — Race + Sprint sessions, SC exclusion via 110% threshold, min(lap_duration) per session across all drivers, tyre_age join for fl_on_fresh_tyre_rate, session_result join for typical_fl_position
-- [ ] 5.2 Handle tied fastest laps: both drivers receive FL credit
-- [ ] 5.3 Create `service/src/lapwise/routes/v1/analysis/fastest_lap.py` — `GET /v1/analysis/fastest-lap-candidates` with query params: last_n_races (default 12), session_key (optional), include_circuit_history (bool, default false)
-- [ ] 5.4 Write unit tests covering: standard request, SC exclusion, tied FL, fresh tyre detection, circuit history
+- [x] 5.1 Implement `service/src/lapwise/services/analysis/fastest_lap.py` — Race + Sprint sessions, SC exclusion via 110% threshold, min(lap_duration) per session across all drivers, tyre_age join for fl_on_fresh_tyre_rate, session_result join for typical_fl_position
+- [x] 5.2 Handle tied fastest laps: both drivers receive FL credit
+- [x] 5.3 Create `service/src/lapwise/routes/v1/analysis/fastest_lap.py` — `GET /v1/analysis/fastest-lap-candidates` with query params: last_n_races (default 12), session_key (optional), include_circuit_history (bool, default false)
+- [x] 5.4 Write unit tests covering: standard request, SC exclusion, tied FL, fresh tyre detection, circuit history
 
 ## 6. Overtake Profile Service + Route
 
@@ -58,17 +58,17 @@
 
 ## 8. Championship Context Service + Route
 
-- [ ] 8.1 Implement `service/src/lapwise/services/analysis/championship_context.py` — momentum from last 3 meetings vs season avg (POSITIVE >120%, NEGATIVE <80%), desperation_index from points gap vs max_remaining (26 pts/race), constructor_battle flag (within 30 pts of adjacent position), under_pressure flag for constructors
-- [ ] 8.2 Handle mathematically eliminated drivers: desperation_index = 100
-- [ ] 8.3 Create `service/src/lapwise/routes/v1/analysis/championship_context.py` — `GET /v1/analysis/championship-context` with query params: season (default current), after_round (optional meeting_key)
-- [ ] 8.4 Write unit tests covering: championship leader, positive momentum, constructor battle flag, after_round filter, mathematical elimination
+- [x] 8.1 Implement `service/src/lapwise/services/analysis/championship_context.py` — momentum from last 3 meetings vs season avg (POSITIVE >120%, NEGATIVE <80%), desperation_index from points gap vs max_remaining (26 pts/race), constructor_battle flag (within 30 pts of adjacent position), under_pressure flag for constructors
+- [x] 8.2 Handle mathematically eliminated drivers: desperation_index = 100
+- [x] 8.3 Create `service/src/lapwise/routes/v1/analysis/championship_context.py` — `GET /v1/analysis/championship-context` with query params: season (default current), after_round (optional meeting_key)
+- [x] 8.4 Write unit tests covering: championship leader, positive momentum, constructor battle flag, after_round filter, mathematical elimination
 
 ## 9. Qualifying Trends Service + Route
 
-- [ ] 9.1 Implement `service/src/lapwise/services/analysis/qualifying_trends.py` — Q2/Q3 appearance rates from grid position proxy (≤10 = Q3, ≤15 = Q2), sector dominance from min sector times across all drivers per session, avg_delta_to_fastest per sector, strongest_sector, grid_vs_expected from championship position delta, recent_trend with ±10% threshold
-- [ ] 9.2 Handle missing sector data: exclude sessions where duration_sector_X is null for most laps
-- [ ] 9.3 Create `service/src/lapwise/routes/v1/analysis/qualifying_trends.py` — `GET /v1/analysis/qualifying-trends` with query params: driver_number (required), last_n_races (default 12), include_circuit_history (bool, default false)
-- [ ] 9.4 Write unit tests covering: Q3 appearance rate, sector dominance leader, overperforming in quali, missing sector data, recent trend calculation
+- [x] 9.1 Implement `service/src/lapwise/services/analysis/qualifying_trends.py` — Q2/Q3 appearance rates from grid position proxy (≤10 = Q3, ≤15 = Q2), sector dominance from min sector times across all drivers per session, avg_delta_to_fastest per sector, strongest_sector, grid_vs_expected from championship position delta, recent_trend with ±10% threshold
+- [x] 9.2 Handle missing sector data: exclude sessions where duration_sector_X is null for most laps
+- [x] 9.3 Create `service/src/lapwise/routes/v1/analysis/qualifying_trends.py` — `GET /v1/analysis/qualifying-trends` with query params: driver_number (required), last_n_races (default 12), include_circuit_history (bool, default false)
+- [x] 9.4 Write unit tests covering: Q3 appearance rate, sector dominance leader, overperforming in quali, missing sector data, recent trend calculation
 
 ## 10. Constructor Pitstop Service + Route
 

@@ -18,6 +18,7 @@ from lapwise.routes.v1 import (
     stints,
     weather,
 )
+from lapwise.routes.v1.analysis import qualifying_trends as analysis_qualifying_trends
 
 router = APIRouter(
     prefix="/v1",
@@ -38,3 +39,10 @@ router.include_router(starting_grid.router)
 router.include_router(weather.router)
 router.include_router(championship_drivers.router)
 router.include_router(championship_teams.router)
+
+# Analysis routes
+router.include_router(
+    analysis_qualifying_trends.router,
+    prefix="/analysis",
+    tags=["Analysis"],
+)

@@ -17,6 +17,7 @@ from lapwise.models.analysis import (
 )
 from lapwise.routes.v1.analysis import overtake_profile as overtake_profile_router
 from lapwise.services.analysis import AnalysisService
+from lapwise.services.analysis.championship_context import ChampionshipContextService
 from lapwise.services.analysis.constructor_pitstop import ConstructorPitstopService
 
 router = APIRouter(
@@ -130,19 +131,30 @@ async def get_circuit_profile(
     response_model=ChampionshipContext,
     summary="Championship context",
     description=(
-        "Return the current driver and constructor championship standings for a given year. "
-        "Data is sourced from the most-recent championship update per driver/team."
+        "Return championship context for drivers and constructors including momentum "
+        "(POSITIVE/NEUTRAL/NEGATIVE), desperation index (0–100), and constructor battle flags. "
+        "Optionally filter to standings as of a specific meeting via `after_round`."
     ),
 )
 async def get_championship_context(
-    svc: Annotated[AnalysisService, Depends(get_analysis_service)],
-    year: Annotated[int, Query(description="Championship year.")],
-    last_n_races: Annotated[
-        int,
-        Query(description="Included for API consistency; not yet used in standings computation."),
-    ] = 5,
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+    season: Annotated[
+        int | None,
+        Query(description="Championship year. Defaults to the current calendar year."),
+    ] = None,
+    after_round: Annotated[
+        int | None,
+        Query(
+            description=(
+                "Return standings after this meeting_key. Only meetings with "
+                "meeting_key <= after_round are included in the calculation."
+            )
+        ),
+    ] = None,
 ) -> ChampionshipContext:
-    return await svc.get_championship_context(year=year, last_n_races=last_n_races)
+    """Return a full championship context snapshot for drivers and constructors."""
+    service = ChampionshipContextService(client)
+    return await service.get_championship_context(season, after_round)
 
 
 @router.get(
