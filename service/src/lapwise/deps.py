@@ -6,9 +6,10 @@ keeping route handlers free from direct instantiation of collaborators.
 
 from typing import Annotated
 
-from fastapi import Depends, Request
+from fastapi import Depends
 
 from lapwise.clients.openf1 import OpenF1Client
+from lapwise.config import get_settings
 from lapwise.services.championship import ChampionshipDriverService, ChampionshipTeamService
 from lapwise.services.drivers import DriverService
 from lapwise.services.laps import LapService
@@ -23,10 +24,9 @@ from lapwise.services.stints import StintService
 from lapwise.services.weather import WeatherService
 
 
-def get_openf1_client(request: Request) -> OpenF1Client:
-    """Return the shared OpenF1Client stored on app state during lifespan startup."""
-    client: OpenF1Client = request.app.state.openf1_client
-    return client
+def get_openf1_client() -> OpenF1Client:
+    """Create an OpenF1Client for this request."""
+    return OpenF1Client(get_settings())
 
 
 async def get_auth() -> None:
