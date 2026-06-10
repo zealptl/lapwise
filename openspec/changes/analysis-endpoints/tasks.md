@@ -65,10 +65,10 @@
 
 ## 9. Qualifying Trends Service + Route
 
-- [ ] 9.1 Implement `service/src/lapwise/services/analysis/qualifying_trends.py` — Q2/Q3 appearance rates from grid position proxy (≤10 = Q3, ≤15 = Q2), sector dominance from min sector times across all drivers per session, avg_delta_to_fastest per sector, strongest_sector, grid_vs_expected from championship position delta, recent_trend with ±10% threshold
-- [ ] 9.2 Handle missing sector data: exclude sessions where duration_sector_X is null for most laps
-- [ ] 9.3 Create `service/src/lapwise/routes/v1/analysis/qualifying_trends.py` — `GET /v1/analysis/qualifying-trends` with query params: driver_number (required), last_n_races (default 12), include_circuit_history (bool, default false)
-- [ ] 9.4 Write unit tests covering: Q3 appearance rate, sector dominance leader, overperforming in quali, missing sector data, recent trend calculation
+- [x] 9.1 Implement `service/src/lapwise/services/analysis/qualifying_trends.py` — Q2/Q3 appearance rates from grid position proxy (≤10 = Q3, ≤15 = Q2), sector dominance from min sector times across all drivers per session, avg_delta_to_fastest per sector, strongest_sector, grid_vs_expected from championship position delta, recent_trend with ±10% threshold
+- [x] 9.2 Handle missing sector data: exclude sessions where duration_sector_X is null for most laps
+- [x] 9.3 Create `service/src/lapwise/routes/v1/analysis/qualifying_trends.py` — `GET /v1/analysis/qualifying-trends` with query params: driver_number (required), last_n_races (default 12), include_circuit_history (bool, default false)
+- [x] 9.4 Write unit tests covering: Q3 appearance rate, sector dominance leader, overperforming in quali, missing sector data, recent trend calculation
 
 ## 10. Constructor Pitstop Service + Route
 
