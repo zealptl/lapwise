@@ -22,11 +22,11 @@
 
 ## 3. Driver Pace Profile Service + Route
 
-- [ ] 3.1 Implement `service/src/lapwise/services/analysis/driver_pace.py` — Qpace score with exponential decay (factor 0.85), sector deltas from qualifying laps, Rpace from prime-window clean-air race laps (tyre_age 3–15, SC exclusion), rpace_percentile vs field, overtake_adjustment from P10+ starts
-- [ ] 3.2 Implement qpace_trend: compare decay-weighted avg of first half vs second half, threshold ±10%
-- [ ] 3.3 Create `service/src/lapwise/routes/v1/analysis/__init__.py`
-- [ ] 3.4 Create `service/src/lapwise/routes/v1/analysis/driver_pace.py` — `GET /v1/analysis/driver-pace-profile` with query params: driver_number (required), last_n_races (default 12), session_key (optional), include_circuit_history (bool, default false)
-- [ ] 3.5 Write unit tests for driver pace service covering: standard request, circuit history merge, insufficient clean laps (null rpace), driver absent from session (0 score contribution)
+- [x] 3.1 Implement `service/src/lapwise/services/analysis/driver_pace.py` — Qpace score with exponential decay (factor 0.85), sector deltas from qualifying laps, Rpace from prime-window clean-air race laps (tyre_age 3–15, SC exclusion), rpace_percentile vs field, overtake_adjustment from P10+ starts
+- [x] 3.2 Implement qpace_trend: compare decay-weighted avg of first half vs second half, threshold ±10%
+- [x] 3.3 Create `service/src/lapwise/routes/v1/analysis/__init__.py`
+- [x] 3.4 Create `service/src/lapwise/routes/v1/analysis/driver_pace.py` — `GET /v1/analysis/driver-pace-profile` with query params: driver_number (required), last_n_races (default 12), session_key (optional), include_circuit_history (bool, default false)
+- [x] 3.5 Write unit tests for driver pace service covering: standard request, circuit history merge, insufficient clean laps (null rpace), driver absent from session (0 score contribution)
 
 ## 4. DNF Rates Service + Route
 
@@ -44,17 +44,17 @@
 
 ## 6. Overtake Profile Service + Route
 
-- [ ] 6.1 Implement `service/src/lapwise/services/analysis/overtake_profile.py` — Race + Sprint sessions, per-driver overtakes_made and overtakes_lost, aggression_score as percentile rank vs field, circuit_overtake_avg when circuit filter active
-- [ ] 6.2 Sprint weekend session count: each session (Race + Sprint) counted separately in total_races denominator
-- [ ] 6.3 Create `service/src/lapwise/routes/v1/analysis/overtake_profile.py` — `GET /v1/analysis/overtake-profile` with query params: driver_number (optional), last_n_races (default 12), session_key (optional), include_circuit_history (bool, default false)
-- [ ] 6.4 Write unit tests covering: all drivers, single driver, zero overtakes, sprint session counting, circuit_overtake_avg population
+- [x] 6.1 Implement `service/src/lapwise/services/analysis/overtake_profile.py` — Race + Sprint sessions, per-driver overtakes_made and overtakes_lost, aggression_score as percentile rank vs field, circuit_overtake_avg when circuit filter active
+- [x] 6.2 Sprint weekend session count: each session (Race + Sprint) counted separately in total_races denominator
+- [x] 6.3 Create `service/src/lapwise/routes/v1/analysis/overtake_profile.py` — `GET /v1/analysis/overtake-profile` with query params: driver_number (optional), last_n_races (default 12), session_key (optional), include_circuit_history (bool, default false)
+- [x] 6.4 Write unit tests covering: all drivers, single driver, zero overtakes, sprint session counting, circuit_overtake_avg population
 
 ## 7. Circuit Profile Service + Route
 
-- [ ] 7.1 Implement `service/src/lapwise/services/analysis/circuit_profile.py` — overtake_difficulty from avg overtakes per race (HIGH <15, MEDIUM 15–30, LOW >30), qualifying_importance derived from difficulty, safety_car_tendency from pct laps >110% median (HIGH >15%, MEDIUM 5–15%, LOW <5%), weather_variability from rainfall pct (HIGH >30%, MEDIUM 10–30%, LOW <10%), typical_compounds by frequency, fl_typical_lap avg, avg_pit_stops from stint count - 1
-- [ ] 7.2 Handle insufficient data: return null for derived fields when fewer than 2 race sessions in sample
-- [ ] 7.3 Create `service/src/lapwise/routes/v1/analysis/circuit_profile.py` — `GET /v1/analysis/circuit-profile` with query params: circuit_key (required), last_n_years (default 3)
-- [ ] 7.4 Write unit tests covering: low overtake circuit, high rainfall, compound frequency ordering, insufficient data handling
+- [x] 7.1 Implement `service/src/lapwise/services/analysis/circuit_profile.py` — overtake_difficulty from avg overtakes per race (HIGH <15, MEDIUM 15–30, LOW >30), qualifying_importance derived from difficulty, safety_car_tendency from pct laps >110% median (HIGH >15%, MEDIUM 5–15%, LOW <5%), weather_variability from rainfall pct (HIGH >30%, MEDIUM 10–30%, LOW <10%), typical_compounds by frequency, fl_typical_lap avg, avg_pit_stops from stint count - 1
+- [x] 7.2 Handle insufficient data: return null for derived fields when fewer than 2 race sessions in sample
+- [x] 7.3 Create `service/src/lapwise/routes/v1/analysis/circuit_profile.py` — `GET /v1/analysis/circuit-profile` with query params: circuit_key (required), last_n_years (default 3)
+- [x] 7.4 Write unit tests covering: low overtake circuit, high rainfall, compound frequency ordering, insufficient data handling
 
 ## 8. Championship Context Service + Route
 
@@ -79,10 +79,10 @@
 
 ## 11. Fantasy Prices Route
 
-- [ ] 11.1 Create `service/src/lapwise/routes/v1/fantasy/__init__.py`
-- [ ] 11.2 Create `service/src/lapwise/routes/v1/fantasy/prices.py` with hardcoded 2025 price dict — all 20 drivers and 10 constructors; include date-last-updated comment and TODO for dynamic pricing
-- [ ] 11.3 Register `GET /v1/fantasy/prices` route — no auth required, returns FantasyPrices model
-- [ ] 11.4 Write unit test: response contains 20 drivers, 10 constructors, all prices between 3.0 and 34.0
+- [x] 11.1 Create `service/src/lapwise/routes/v1/fantasy/__init__.py`
+- [x] 11.2 Create `service/src/lapwise/routes/v1/fantasy/prices.py` with hardcoded 2025 price dict — all 20 drivers and 10 constructors; include date-last-updated comment and TODO for dynamic pricing
+- [x] 11.3 Register `GET /v1/fantasy/prices` route — no auth required, returns FantasyPrices model
+- [x] 11.4 Write unit test: response contains 20 drivers, 10 constructors, all prices between 3.0 and 34.0
 
 ## 12. Route Registration
 
