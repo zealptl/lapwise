@@ -22,11 +22,11 @@
 
 ## 3. Driver Pace Profile Service + Route
 
-- [ ] 3.1 Implement `service/src/lapwise/services/analysis/driver_pace.py` — Qpace score with exponential decay (factor 0.85), sector deltas from qualifying laps, Rpace from prime-window clean-air race laps (tyre_age 3–15, SC exclusion), rpace_percentile vs field, overtake_adjustment from P10+ starts
-- [ ] 3.2 Implement qpace_trend: compare decay-weighted avg of first half vs second half, threshold ±10%
-- [ ] 3.3 Create `service/src/lapwise/routes/v1/analysis/__init__.py`
-- [ ] 3.4 Create `service/src/lapwise/routes/v1/analysis/driver_pace.py` — `GET /v1/analysis/driver-pace-profile` with query params: driver_number (required), last_n_races (default 12), session_key (optional), include_circuit_history (bool, default false)
-- [ ] 3.5 Write unit tests for driver pace service covering: standard request, circuit history merge, insufficient clean laps (null rpace), driver absent from session (0 score contribution)
+- [x] 3.1 Implement `service/src/lapwise/services/analysis/driver_pace.py` — Qpace score with exponential decay (factor 0.85), sector deltas from qualifying laps, Rpace from prime-window clean-air race laps (tyre_age 3–15, SC exclusion), rpace_percentile vs field, overtake_adjustment from P10+ starts
+- [x] 3.2 Implement qpace_trend: compare decay-weighted avg of first half vs second half, threshold ±10%
+- [x] 3.3 Create `service/src/lapwise/routes/v1/analysis/__init__.py`
+- [x] 3.4 Create `service/src/lapwise/routes/v1/analysis/driver_pace.py` — `GET /v1/analysis/driver-pace-profile` with query params: driver_number (required), last_n_races (default 12), session_key (optional), include_circuit_history (bool, default false)
+- [x] 3.5 Write unit tests for driver pace service covering: standard request, circuit history merge, insufficient clean laps (null rpace), driver absent from session (0 score contribution)
 
 ## 4. DNF Rates Service + Route
 
