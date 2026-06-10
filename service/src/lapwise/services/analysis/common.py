@@ -1,114 +1,89 @@
 """Shared utilities for analysis services."""
-
 import asyncio
+from datetime import datetime
 
+from lapwise.clients.openf1 import OpenF1Client
 from lapwise.models.meetings import Meeting
 from lapwise.models.sessions import Session
 
-# Laps exceeding this multiple of the session median are treated as safety-car-influenced.
 SC_LAP_EXCLUSION_THRESHOLD = 1.10
 
 
 async def get_last_n_meeting_keys(
-    client: object,
+    client: OpenF1Client,
     n: int,
     year: int | None = None,
     circuit_key: int | None = None,
     year_range: tuple[int, int] | None = None,
 ) -> list[int]:
-    """Return the meeting_keys for the last *n* meetings matching the given filters.
-
-    Meetings are sorted by date_start descending before slicing to *n*.
+    """Return the meeting_keys for the last N meetings, most recent first.
 
     Args:
-        client: An :class:`~lapwise.clients.openf1.OpenF1Client` instance.
-        n: Maximum number of meeting keys to return.
-        year: Optional single year filter.
-        circuit_key: Optional circuit filter.
-        year_range: Optional ``(start_year, end_year)`` inclusive range; merged and deduplicated
-            with any results from the ``year`` filter.
+        client: The OpenF1 API client.
+        n: Number of most recent meetings to return.
+        year: Optional year filter for the base query.
+        circuit_key: Optional circuit key for historical range queries.
+        year_range: Optional (start, end) year range used together with circuit_key
+            to fetch additional historical meetings.
 
     Returns:
-        A deduplicated list of meeting_keys (up to *n*), most recent first.
+        List of meeting_key integers, sorted by date_start descending, length <= n.
     """
-    from lapwise.clients.openf1 import OpenF1Client  # avoid circular at module level
-
-    c: OpenF1Client = client  # type: ignore[assignment]
-
-    filters: dict[str, object] = {}
-    if circuit_key is not None:
-        filters["circuit_key"] = circuit_key
+    filters: dict = {}
     if year is not None:
         filters["year"] = year
 
-    # Fetch the primary set of meetings
-    meetings: list[Meeting] = await c.get("meetings", Meeting, **filters)
+    meetings: list[Meeting] = await client.get("meetings", Meeting, **filters)
 
-    # Optionally merge results from a year range
-    if year_range is not None:
-        start_year, end_year = year_range
-        range_filters: dict[str, object] = dict(filters)
-        range_filters.pop("year", None)  # year_range supersedes year for range fetch
-        tasks = [
-            c.get("meetings", Meeting, year=yr, **{k: v for k, v in range_filters.items()})
-            for yr in range(start_year, end_year + 1)
-        ]
-        range_results = await asyncio.gather(*tasks)
+    if circuit_key is not None and year_range is not None:
+        start, end = year_range
+        extra_meetings_lists = await asyncio.gather(
+            *[
+                client.get("meetings", Meeting, year=y, circuit_key=circuit_key)
+                for y in range(start, end + 1)
+            ]
+        )
         seen_keys: set[int] = {m.meeting_key for m in meetings}
-        for batch in range_results:
-            for m in batch:
+        for extra_list in extra_meetings_lists:
+            for m in extra_list:
                 if m.meeting_key not in seen_keys:
                     meetings.append(m)
                     seen_keys.add(m.meeting_key)
 
-    # Sort by date descending (meetings without a date_start sort last)
-    meetings.sort(key=lambda m: m.date_start or 0, reverse=True)  # type: ignore[arg-type]
+    meetings.sort(
+        key=lambda m: m.date_start if m.date_start is not None else datetime.min,
+        reverse=True,
+    )
 
-    # Deduplicate while preserving order
-    seen: set[int] = set()
-    ordered: list[Meeting] = []
-    for m in meetings:
-        if m.meeting_key not in seen:
-            seen.add(m.meeting_key)
-            ordered.append(m)
-
-    return [m.meeting_key for m in ordered[:n]]
+    return [m.meeting_key for m in meetings[:n]]
 
 
 async def get_sessions_for_meetings(
-    client: object,
+    client: OpenF1Client,
     meeting_keys: list[int],
     session_types: list[str],
 ) -> list[Session]:
-    """Fetch sessions for a list of meeting keys, filtered by session type.
+    """Return sessions for the given meetings, filtered by session type.
 
-    Cancelled sessions are excluded.  All meeting fetches run in parallel.
+    Fetches sessions for each meeting key in parallel and returns those whose
+    session_type is in session_types and that are not cancelled.
 
     Args:
-        client: An :class:`~lapwise.clients.openf1.OpenF1Client` instance.
-        meeting_keys: List of meeting_key integers to fetch sessions for.
-        session_types: Only sessions whose ``session_type`` is in this list are returned.
+        client: The OpenF1 API client.
+        meeting_keys: List of meeting keys to fetch sessions for.
+        session_types: Allowed session type values (e.g. ["Race", "Qualifying"]).
 
     Returns:
-        A flat list of non-cancelled :class:`~lapwise.models.sessions.Session` objects.
+        Flat list of matching, non-cancelled Session instances.
     """
-    from lapwise.clients.openf1 import OpenF1Client  # avoid circular at module level
-
-    c: OpenF1Client = client  # type: ignore[assignment]
-
-    if not meeting_keys:
-        return []
-
-    tasks = [c.get("sessions", Session, meeting_key=mk) for mk in meeting_keys]
-    results = await asyncio.gather(*tasks)
+    results: tuple[list[Session], ...] = await asyncio.gather(
+        *[client.get("sessions", Session, meeting_key=mk) for mk in meeting_keys]
+    )
 
     sessions: list[Session] = []
-    type_set = set(session_types)
-    for batch in results:
-        for s in batch:
-            if s.is_cancelled:
-                continue
-            if s.session_type in type_set:
+    for session_list in results:
+        for s in session_list:
+            if s.session_type in session_types and not s.is_cancelled:
                 sessions.append(s)
 
     return sessions

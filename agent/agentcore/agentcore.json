@@ -1,0 +1,39 @@
+{
+  "name": "LapwiseF1Agent",
+  "build": {
+    "type": "CodeZip",
+    "handler": "app.LapwiseF1Agent.main:app"
+  },
+  "model": "anthropic.claude-sonnet-4-6",
+  "runtime": {
+    "memory_resource_id": "${MEMORY_RESOURCE_ID}",
+    "observability_resource_id": "${OBSERVABILITY_RESOURCE_ID}",
+    "gateway_id": "${GATEWAY_RESOURCE_ID}"
+  },
+  "environment": {
+    "MEMORY_ID": "${MEMORY_ID}",
+    "COGNITO_CLIENT_A_SECRET_ARN": "${COGNITO_CLIENT_A_SECRET_ARN}",
+    "COGNITO_CLIENT_A_ID": "${COGNITO_CLIENT_A_ID}",
+    "AWS_REGION": "us-east-1"
+  },
+  "iamPermissions": [
+    {
+      "effect": "Allow",
+      "actions": ["secretsmanager:GetSecretValue"],
+      "resources": ["${COGNITO_CLIENT_A_SECRET_ARN}"]
+    },
+    {
+      "effect": "Allow",
+      "actions": ["bedrock:InvokeModel"],
+      "resources": ["arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-6"]
+    },
+    {
+      "effect": "Allow",
+      "actions": [
+        "bedrock-agentcore:RetrieveMemoryRecords",
+        "bedrock-agentcore:CreateMemorySessionEvent"
+      ],
+      "resources": ["${MEMORY_RESOURCE_ARN}"]
+    }
+  ]
+}
