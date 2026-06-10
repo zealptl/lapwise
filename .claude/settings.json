@@ -16,5 +16,9 @@
       "Write(/Users/zealpatel/development/vibes/lapwise-*/**)",
       "Edit(/Users/zealpatel/development/vibes/lapwise-*/**)"
     ]
+  },
+  "enabledPlugins": {
+    "deploy-on-aws@claude-plugins-official": true,
+    "aws-agents@claude-plugins-official": true
   }
 }
