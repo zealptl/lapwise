@@ -33,23 +33,25 @@ async def get_last_n_meeting_keys(
     filters: dict[str, Any] = {}
     if year is not None:
         filters["year"] = year
-    if circuit_key is not None:
+    # Only apply circuit_key on the base call when no year_range is requested;
+    # circuit-scoped history is fetched per-year in the range loop below.
+    if circuit_key is not None and year_range is None:
         filters["circuit_key"] = circuit_key
 
     meetings: list[Meeting] = await client.get("meetings", Meeting, **filters)
 
     if year_range is not None:
         start_year, end_year = year_range
-        range_filters: dict[str, Any] = {"year_gte": start_year, "year_lte": end_year}
-        if circuit_key is not None:
-            range_filters["circuit_key"] = circuit_key
-        extra: list[Meeting] = await client.get("meetings", Meeting, **range_filters)
-        # Merge with deduplication by meeting_key
         existing_keys = {m.meeting_key for m in meetings}
-        for m in extra:
-            if m.meeting_key not in existing_keys:
-                meetings.append(m)
-                existing_keys.add(m.meeting_key)
+        for y in range(start_year, end_year + 1):
+            year_filters: dict[str, Any] = {"year": y}
+            if circuit_key is not None:
+                year_filters["circuit_key"] = circuit_key
+            extra: list[Meeting] = await client.get("meetings", Meeting, **year_filters)
+            for m in extra:
+                if m.meeting_key not in existing_keys:
+                    meetings.append(m)
+                    existing_keys.add(m.meeting_key)
 
     # Sort by date descending (most recent first), slice to N
     meetings.sort(key=lambda m: m.date_start or "", reverse=True)
