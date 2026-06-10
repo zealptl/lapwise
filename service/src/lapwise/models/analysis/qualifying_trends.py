@@ -1,54 +1,81 @@
-"""Pydantic models for driver qualifying trend analysis."""
+"""Pydantic response models for the Qualifying Trends analysis endpoint."""
 
 from pydantic import BaseModel, Field
 
 
 class SectorStats(BaseModel):
-    """Qualifying statistics for a single track sector."""
+    """Statistics for a single sector across qualifying sessions."""
 
     avg_delta_to_fastest: float | None = Field(
-        default=None, description="Avg gap to fastest sector time in field (seconds)."
+        default=None,
+        description="Average gap (seconds) to the field's best sector time across sessions.",
     )
-    dominance_rate: float = Field(
-        description="Proportion of sessions where driver set fastest sector time."
+    dominance_rate: float | None = Field(
+        default=None,
+        description=(
+            "Fraction of qualifying sessions in which this driver set "
+            "the overall fastest sector time (0.0–1.0)."
+        ),
     )
 
 
 class SectorDominance(BaseModel):
-    """Sector dominance breakdown across all three track sectors."""
+    """Per-sector dominance breakdown across qualifying sessions."""
 
-    sector_1: SectorStats = Field(description="Dominance statistics for sector 1.")
-    sector_2: SectorStats = Field(description="Dominance statistics for sector 2.")
-    sector_3: SectorStats = Field(description="Dominance statistics for sector 3.")
+    sector_1: SectorStats = Field(description="Sector 1 statistics.")
+    sector_2: SectorStats = Field(description="Sector 2 statistics.")
+    sector_3: SectorStats = Field(description="Sector 3 statistics.")
 
 
 class QualifyingTrends(BaseModel):
-    """Qualifying performance trends for a driver over recent race weekends."""
+    """Aggregated qualifying performance trends for a single driver."""
 
-    driver_number: int = Field(description="Official driver racing number.")
-    avg_grid_position: float = Field(
-        description="Average starting grid position in sample."
+    driver_number: int = Field(description="Car number of the driver.")
+    sessions_analysed: int = Field(
+        description="Number of qualifying sessions included in the analysis."
     )
-    best_grid_position: int = Field(description="Best (lowest) grid position achieved in sample.")
-    worst_grid_position: int = Field(
-        description="Worst (highest) grid position achieved in sample."
+    avg_grid_position: float | None = Field(
+        default=None,
+        description="Decay-weighted average grid position (decay factor 0.85, most-recent = weight 1).",
     )
-    q2_appearance_rate: float = Field(
-        description="Proportion of qualifying sessions where driver reached Q2."
+    best_grid_position: int | None = Field(
+        default=None,
+        description="Best (lowest) grid position achieved across the sampled sessions.",
     )
-    q3_appearance_rate: float = Field(
-        description="Proportion of qualifying sessions where driver reached Q3."
+    worst_grid_position: int | None = Field(
+        default=None,
+        description="Worst (highest number) grid position achieved across the sampled sessions.",
+    )
+    q3_appearance_rate: float | None = Field(
+        default=None,
+        description="Fraction of sessions where the driver started from positions 1–10 (Q3 proxy).",
+    )
+    q2_appearance_rate: float | None = Field(
+        default=None,
+        description="Fraction of sessions where the driver started from positions 1–15 (Q2 proxy).",
     )
     sector_dominance: SectorDominance = Field(
-        description="Sector dominance statistics broken down by sector."
+        description="Per-sector dominance statistics derived from qualifying lap data."
     )
-    strongest_sector: str | None = Field(
-        default=None, description="Sector with smallest avg delta to fastest: S1, S2, or S3."
+    strongest_sector: int | None = Field(
+        default=None,
+        description=(
+            "Sector number (1, 2, or 3) where the driver has the smallest average gap "
+            "to the field fastest. None if no sector data is available."
+        ),
     )
-    grid_vs_expected: float = Field(
-        description="Delta between actual avg grid position and championship-position-expected position."
+    grid_vs_expected: float | None = Field(
+        default=None,
+        description=(
+            "Average difference between actual grid position and championship position "
+            "at the time of the race. Negative means qualifying ahead of championship standing."
+        ),
     )
-    recent_trend: str = Field(
-        description="Qualifying trend direction: IMPROVING, STABLE, or DECLINING."
+    recent_trend: str | None = Field(
+        default=None,
+        description=(
+            "Direction of grid position trend: IMPROVING, STABLE, or DECLINING. "
+            "Computed by comparing the decay-weighted average of the older half of sessions "
+            "against the newer half (threshold ±10%)."
+        ),
     )
-    sample_races: int = Field(description="Number of race weekends included in the sample.")
