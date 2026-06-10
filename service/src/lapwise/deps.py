@@ -132,3 +132,12 @@ def get_championship_team_service(
 ) -> ChampionshipTeamService:
     """Return a ChampionshipTeamService for the current request."""
     return ChampionshipTeamService(client)
+
+
+def get_analysis_service(
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+) -> "AnalysisService":
+    """Return an AnalysisService for the current request."""
+    from lapwise.services.analysis import AnalysisService
+
+    return AnalysisService(client)
