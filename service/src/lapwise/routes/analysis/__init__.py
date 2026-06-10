@@ -18,6 +18,7 @@ from lapwise.models.analysis import (
 from lapwise.routes.v1.analysis import overtake_profile as overtake_profile_router
 from lapwise.services.analysis import AnalysisService
 from lapwise.services.analysis.championship_context import ChampionshipContextService
+from lapwise.services.analysis.constructor_pitstop import ConstructorPitstopService
 
 router = APIRouter(
     prefix="/v1/analysis",
@@ -179,14 +180,24 @@ async def get_qualifying_trends(
     response_model=list[ConstructorPitstop],
     summary="Constructor pit stop performance",
     description=(
-        "Return per-constructor pit stop statistics at a circuit: average stationary "
-        "duration (ms), average stops per race, and threshold frequency breakdown "
-        "(sub-2 s and sub-3 s). Results sorted by average duration ascending."
+        "Return per-constructor pit stop statistics including F1 Fantasy bracket scoring, "
+        "fastest pitstop rate, sub-2s rate, and consistency score across recent race weekends."
     ),
 )
 async def get_constructor_pitstop(
-    svc: Annotated[AnalysisService, Depends(get_analysis_service)],
-    circuit_key: Annotated[int, Query(description="OpenF1 circuit identifier.")],
-    year: Annotated[int, Query(description="Championship year.")],
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+    team_name: Annotated[
+        str | None,
+        Query(description="Filter results to a single constructor by team name."),
+    ] = None,
+    last_n_races: Annotated[
+        int,
+        Query(description="Number of recent race weekends to include in the sample.", ge=1),
+    ] = 12,
+    include_circuit_history: Annotated[
+        bool,
+        Query(description="Reserved: currently falls back to last_n_races behaviour."),
+    ] = False,
 ) -> list[ConstructorPitstop]:
-    return await svc.get_constructor_pitstop(circuit_key=circuit_key, year=year)
+    service = ConstructorPitstopService(client)
+    return await service.get_constructor_pitstops(team_name, last_n_races, include_circuit_history)
