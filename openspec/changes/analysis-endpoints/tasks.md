@@ -1,11 +1,11 @@
 ## 1. Shared Analysis Utility
 
-- [ ] 1.1 Create `service/src/lapwise/services/analysis/__init__.py`
-- [ ] 1.2 Implement `get_last_n_meeting_keys(client, n, year, circuit_key, year_range)` in `service/src/lapwise/services/analysis/common.py` — fetches meetings, sorts by date descending, slices to N, supports circuit_key + year_range merge with deduplication
-- [ ] 1.3 Implement `get_sessions_for_meetings(client, meeting_keys, session_types)` in `common.py` — parallel fetch via asyncio.gather, excludes is_cancelled=True sessions
-- [ ] 1.4 Define `SC_LAP_EXCLUSION_THRESHOLD = 1.10` constant in `common.py`
-- [ ] 1.5 Write unit tests for `get_last_n_meeting_keys` covering: basic N slice, circuit_key filter, year_range merge, deduplication
-- [ ] 1.6 Write unit tests for `get_sessions_for_meetings` covering: session_type filter, cancelled session exclusion, parallel fetch
+- [x] 1.1 Create `service/src/lapwise/services/analysis/__init__.py`
+- [x] 1.2 Implement `get_last_n_meeting_keys(client, n, year, circuit_key, year_range)` in `service/src/lapwise/services/analysis/common.py` — fetches meetings, sorts by date descending, slices to N, supports circuit_key + year_range merge with deduplication
+- [x] 1.3 Implement `get_sessions_for_meetings(client, meeting_keys, session_types)` in `common.py` — parallel fetch via asyncio.gather, excludes is_cancelled=True sessions
+- [x] 1.4 Define `SC_LAP_EXCLUSION_THRESHOLD = 1.10` constant in `common.py`
+- [x] 1.5 Write unit tests for `get_last_n_meeting_keys` covering: basic N slice, circuit_key filter, year_range merge, deduplication
+- [x] 1.6 Write unit tests for `get_sessions_for_meetings` covering: session_type filter, cancelled session exclusion, parallel fetch
 
 ## 2. Pydantic Response Models
 
