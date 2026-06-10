@@ -51,10 +51,10 @@
 
 ## 7. Circuit Profile Service + Route
 
-- [ ] 7.1 Implement `service/src/lapwise/services/analysis/circuit_profile.py` — overtake_difficulty from avg overtakes per race (HIGH <15, MEDIUM 15–30, LOW >30), qualifying_importance derived from difficulty, safety_car_tendency from pct laps >110% median (HIGH >15%, MEDIUM 5–15%, LOW <5%), weather_variability from rainfall pct (HIGH >30%, MEDIUM 10–30%, LOW <10%), typical_compounds by frequency, fl_typical_lap avg, avg_pit_stops from stint count - 1
-- [ ] 7.2 Handle insufficient data: return null for derived fields when fewer than 2 race sessions in sample
-- [ ] 7.3 Create `service/src/lapwise/routes/v1/analysis/circuit_profile.py` — `GET /v1/analysis/circuit-profile` with query params: circuit_key (required), last_n_years (default 3)
-- [ ] 7.4 Write unit tests covering: low overtake circuit, high rainfall, compound frequency ordering, insufficient data handling
+- [x] 7.1 Implement `service/src/lapwise/services/analysis/circuit_profile.py` — overtake_difficulty from avg overtakes per race (HIGH <15, MEDIUM 15–30, LOW >30), qualifying_importance derived from difficulty, safety_car_tendency from pct laps >110% median (HIGH >15%, MEDIUM 5–15%, LOW <5%), weather_variability from rainfall pct (HIGH >30%, MEDIUM 10–30%, LOW <10%), typical_compounds by frequency, fl_typical_lap avg, avg_pit_stops from stint count - 1
+- [x] 7.2 Handle insufficient data: return null for derived fields when fewer than 2 race sessions in sample
+- [x] 7.3 Create `service/src/lapwise/routes/v1/analysis/circuit_profile.py` — `GET /v1/analysis/circuit-profile` with query params: circuit_key (required), last_n_years (default 3)
+- [x] 7.4 Write unit tests covering: low overtake circuit, high rainfall, compound frequency ordering, insufficient data handling
 
 ## 8. Championship Context Service + Route
 
