@@ -1,22 +1,22 @@
 ## 1. Lapwise API — New Endpoints
 
-- [ ] 1.1 Add `GET /v1/analysis/driver-pace-profile` FastAPI route with typed request params (`driver_number`, `circuit_key`, `year`, `include_circuit_history`) and Pydantic response model
-- [ ] 1.2 Implement `driver-pace-profile` handler: aggregate lap and stint data from existing OpenF1 client; when `include_circuit_history=true`, fetch same circuit for year-1 and year-2
-- [ ] 1.3 Add `GET /v1/analysis/dnf-rates` route and handler: compute DNF rates per driver/constructor from session_result data; support `last_n_races` and `include_circuit_history` params
-- [ ] 1.4 Add `GET /v1/analysis/fastest-lap-candidates` route and handler: rank drivers by historical fastest-lap frequency at circuit using laps data
-- [ ] 1.5 Add `GET /v1/analysis/overtake-profile` route and handler: aggregate overtakes and positions-gained per driver using overtakes + starting_grid + session_result data
-- [ ] 1.6 Add `GET /v1/analysis/circuit-profile` route and handler: compute overtake difficulty, pitstop frequency, tyre strategies, safety car probability from laps + pit + weather data
-- [ ] 1.7 Add `GET /v1/analysis/championship-context` route and handler: return standings + per-driver points trajectory using championship_drivers + championship_teams data; support `last_n_races`
-- [ ] 1.8 Add `GET /v1/analysis/qualifying-trends` route and handler: return per-driver average qualifying position and Q3 frequency from starting_grid data
-- [ ] 1.9 Add `GET /v1/analysis/constructor-pitstop` route and handler: return per-constructor pit stop statistics with F1 Fantasy threshold frequency breakdown using pit data
-- [ ] 1.10 Add `GET /v1/fantasy/prices` route with hardcoded 2025 driver and constructor prices (20 drivers, 10 constructors); define `DriverPrice` and `ConstructorPrice` Pydantic models with `driver_number`, `full_name`, `abbreviation`, `team`, `price_millions`
-- [ ] 1.11 Register all new analysis routes on the `/v1/analysis` router and prices route on a `/v1/fantasy` router; add `Fantasy` tag with description to OpenAPI metadata
-- [ ] 1.12 Add FastAPI `summary` and `description` to every new endpoint so `/openapi.json` provides full documentation for gateway tool catalog
+- [x] 1.1 Add `GET /v1/analysis/driver-pace-profile` FastAPI route with typed request params (`driver_number`, `circuit_key`, `year`, `include_circuit_history`) and Pydantic response model
+- [x] 1.2 Implement `driver-pace-profile` handler: aggregate lap and stint data from existing OpenF1 client; when `include_circuit_history=true`, fetch same circuit for year-1 and year-2
+- [x] 1.3 Add `GET /v1/analysis/dnf-rates` route and handler: compute DNF rates per driver/constructor from session_result data; support `last_n_races` and `include_circuit_history` params
+- [x] 1.4 Add `GET /v1/analysis/fastest-lap-candidates` route and handler: rank drivers by historical fastest-lap frequency at circuit using laps data
+- [x] 1.5 Add `GET /v1/analysis/overtake-profile` route and handler: aggregate overtakes and positions-gained per driver using overtakes + starting_grid + session_result data
+- [x] 1.6 Add `GET /v1/analysis/circuit-profile` route and handler: compute overtake difficulty, pitstop frequency, tyre strategies, safety car probability from laps + pit + weather data
+- [x] 1.7 Add `GET /v1/analysis/championship-context` route and handler: return standings + per-driver points trajectory using championship_drivers + championship_teams data; support `last_n_races`
+- [x] 1.8 Add `GET /v1/analysis/qualifying-trends` route and handler: return per-driver average qualifying position and Q3 frequency from starting_grid data
+- [x] 1.9 Add `GET /v1/analysis/constructor-pitstop` route and handler: return per-constructor pit stop statistics with F1 Fantasy threshold frequency breakdown using pit data
+- [x] 1.10 Add `GET /v1/fantasy/prices` route with hardcoded 2025 driver and constructor prices (20 drivers, 10 constructors); define `DriverPrice` and `ConstructorPrice` Pydantic models with `driver_number`, `full_name`, `abbreviation`, `team`, `price_millions`
+- [x] 1.11 Register all new analysis routes on the `/v1/analysis` router and prices route on a `/v1/fantasy` router; add `Fantasy` tag with description to OpenAPI metadata
+- [x] 1.12 Add FastAPI `summary` and `description` to every new endpoint so `/openapi.json` provides full documentation for gateway tool catalog
 
 ## 2. Lapwise API — OpenAPI Public Access
 
-- [ ] 2.1 In `infra/lib/lapwise-stack.ts`, add `HttpNoneAuthorizer` route overrides for `GET /openapi.json` and `GET /docs` (same pattern as the existing `/healthz` exemption on line 80); redeploy `infra/` — the AgentCore Gateway fetches `/openapi.json` without a token to build its tool catalog
-- [ ] 2.2 Add integration test asserting `GET /openapi.json` returns HTTP 200 without an Authorization header and that the response includes all new analysis and fantasy paths
+- [x] 2.1 In `infra/lib/lapwise-stack.ts`, add `HttpNoneAuthorizer` route overrides for `GET /openapi.json` and `GET /docs` (same pattern as the existing `/healthz` exemption on line 80); redeploy `infra/` — the AgentCore Gateway fetches `/openapi.json` without a token to build its tool catalog
+- [x] 2.2 Add integration test asserting `GET /openapi.json` returns HTTP 200 without an Authorization header and that the response includes all new analysis and fantasy paths
 
 ## 3. Cognito M2M App Clients
 
@@ -24,7 +24,7 @@
 - [ ] 3.2 Store client A `client_id` and `client_secret` in AWS Secrets Manager under `lapwise/agent/cognito-client-a`
 - [ ] 3.3 Create Cognito M2M app client B (Gateway→Lapwise) in the same User Pool: enable client credentials grant; assign Lapwise API resource server scopes
 - [ ] 3.4 Store client B `client_id` and `client_secret` in AWS Secrets Manager under `lapwise/agent/cognito-client-b`
-- [ ] 3.5 In `infra/lib/lapwise-stack.ts`, add client B's `userPoolClientId` to the `jwtAudience` array on `HttpJwtAuthorizer` (line 56) so Gateway→Lapwise tokens are accepted; redeploy `infra/`
+- [x] 3.5 In `infra/lib/lapwise-stack.ts`, add client B's `userPoolClientId` to the `jwtAudience` array on `HttpJwtAuthorizer` (line 56) so Gateway→Lapwise tokens are accepted; redeploy `infra/`
 - [ ] 3.6 Verify that a token issued by client A is NOT accepted by the Lapwise API Gateway authorizer (wrong audience); document in the agent README
 
 ## 4. AgentCore Infrastructure Setup

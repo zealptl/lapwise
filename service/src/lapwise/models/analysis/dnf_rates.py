@@ -1,37 +1,29 @@
-"""Pydantic models for the DNF rates analysis endpoint."""
+"""Pydantic models for driver DNF rate analysis."""
 
 from pydantic import BaseModel, Field
 
 
 class DnfBreakdown(BaseModel):
-    """DNF/DNS/DSQ rate breakdown by session type."""
+    """DNF rates broken down by session type."""
 
-    qualifying_dnf_rate: float = Field(
-        description="Fraction of qualifying sessions with a DNF/DNS/DSQ (0.0–1.0)."
-    )
-    race_dnf_rate: float = Field(
-        description="Fraction of race sessions with a DNF/DNS/DSQ (0.0–1.0)."
-    )
-    sprint_dnf_rate: float = Field(
-        description="Fraction of sprint sessions with a DNF/DNS/DSQ (0.0–1.0)."
-    )
+    qualifying_dnf_rate: float = Field(description="DNF rate across qualifying sessions.")
+    race_dnf_rate: float = Field(description="DNF rate across race sessions.")
+    sprint_dnf_rate: float = Field(description="DNF rate across sprint sessions.")
 
 
 class DnfRates(BaseModel):
-    """Aggregated DNF/DNS/DSQ statistics for a single driver."""
+    """Reliability and DNF statistics for a driver."""
 
-    driver_number: int = Field(description="Car number of the driver.")
-    dnf_count: int = Field(description="Number of sessions where the driver DNF'd.")
-    dns_count: int = Field(description="Number of sessions where the driver DNS'd.")
-    dsq_count: int = Field(description="Number of sessions where the driver was DSQ'd.")
+    driver_number: int = Field(description="Official driver racing number.")
+    dnf_count: int = Field(description="Total number of did-not-finish results in sample.")
+    dns_count: int = Field(description="Total number of did-not-start results in sample.")
+    dsq_count: int = Field(description="Total number of disqualification results in sample.")
     total_sessions: int = Field(
-        description="Number of sessions in which the driver has a result entry."
+        description="Total competitive sessions in sample (Qualifying, Race, Sprint)."
     )
-    dnf_rate: float = Field(
-        description="Combined (DNF + DNS + DSQ) / total_sessions rate (0.0–1.0)."
-    )
+    dnf_rate: float = Field(description="Overall DNF rate across all sessions in sample.")
     reliability_score: float = Field(
-        description="Reliability expressed as a percentage: (1 - dnf_rate) * 100."
+        description="Composite reliability score (higher is more reliable)."
     )
+    breakdown: DnfBreakdown = Field(description="DNF rates broken down by session type.")
     sample_races: int = Field(description="Number of race weekends included in the sample.")
-    breakdown: DnfBreakdown = Field(description="Per-session-type DNF rate breakdown.")
