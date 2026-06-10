@@ -7,6 +7,7 @@ class DriverChampionshipContext(BaseModel):
     """Championship standings and momentum context for a single driver."""
 
     driver_number: int = Field(description="Official driver racing number.")
+    full_name: str | None = Field(default=None, description="Driver's full name.")
     team_name: str | None = Field(default=None, description="Constructor name the driver races for.")
     points_current: float = Field(description="Driver's total championship points to date.")
     championship_position: int = Field(description="Driver's current championship standing position.")
@@ -33,8 +34,8 @@ class ConstructorChampionshipContext(BaseModel):
     team_name: str = Field(description="Constructor name.")
     points_current: float = Field(description="Constructor's total championship points to date.")
     constructor_position: int = Field(description="Constructor's current championship standing position.")
-    points_gap_to_next: float = Field(
-        description="Points deficit to the constructor directly ahead (0 if leading)."
+    points_gap_to_leader: float = Field(
+        description="Points gap to the leading constructor (0 for the leader)."
     )
     under_pressure: bool = Field(
         description="Whether the constructor is within 30 pts of an adjacent position."

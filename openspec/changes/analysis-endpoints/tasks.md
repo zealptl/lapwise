@@ -58,10 +58,10 @@
 
 ## 8. Championship Context Service + Route
 
-- [ ] 8.1 Implement `service/src/lapwise/services/analysis/championship_context.py` — momentum from last 3 meetings vs season avg (POSITIVE >120%, NEGATIVE <80%), desperation_index from points gap vs max_remaining (26 pts/race), constructor_battle flag (within 30 pts of adjacent position), under_pressure flag for constructors
-- [ ] 8.2 Handle mathematically eliminated drivers: desperation_index = 100
-- [ ] 8.3 Create `service/src/lapwise/routes/v1/analysis/championship_context.py` — `GET /v1/analysis/championship-context` with query params: season (default current), after_round (optional meeting_key)
-- [ ] 8.4 Write unit tests covering: championship leader, positive momentum, constructor battle flag, after_round filter, mathematical elimination
+- [x] 8.1 Implement `service/src/lapwise/services/analysis/championship_context.py` — momentum from last 3 meetings vs season avg (POSITIVE >120%, NEGATIVE <80%), desperation_index from points gap vs max_remaining (26 pts/race), constructor_battle flag (within 30 pts of adjacent position), under_pressure flag for constructors
+- [x] 8.2 Handle mathematically eliminated drivers: desperation_index = 100
+- [x] 8.3 Create `service/src/lapwise/routes/v1/analysis/championship_context.py` — `GET /v1/analysis/championship-context` with query params: season (default current), after_round (optional meeting_key)
+- [x] 8.4 Write unit tests covering: championship leader, positive momentum, constructor battle flag, after_round filter, mathematical elimination
 
 ## 9. Qualifying Trends Service + Route
 
