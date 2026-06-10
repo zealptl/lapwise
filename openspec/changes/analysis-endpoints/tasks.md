@@ -37,10 +37,10 @@
 
 ## 5. Fastest Lap Candidates Service + Route
 
-- [ ] 5.1 Implement `service/src/lapwise/services/analysis/fastest_lap.py` — Race + Sprint sessions, SC exclusion via 110% threshold, min(lap_duration) per session across all drivers, tyre_age join for fl_on_fresh_tyre_rate, session_result join for typical_fl_position
-- [ ] 5.2 Handle tied fastest laps: both drivers receive FL credit
-- [ ] 5.3 Create `service/src/lapwise/routes/v1/analysis/fastest_lap.py` — `GET /v1/analysis/fastest-lap-candidates` with query params: last_n_races (default 12), session_key (optional), include_circuit_history (bool, default false)
-- [ ] 5.4 Write unit tests covering: standard request, SC exclusion, tied FL, fresh tyre detection, circuit history
+- [x] 5.1 Implement `service/src/lapwise/services/analysis/fastest_lap.py` — Race + Sprint sessions, SC exclusion via 110% threshold, min(lap_duration) per session across all drivers, tyre_age join for fl_on_fresh_tyre_rate, session_result join for typical_fl_position
+- [x] 5.2 Handle tied fastest laps: both drivers receive FL credit
+- [x] 5.3 Create `service/src/lapwise/routes/v1/analysis/fastest_lap.py` — `GET /v1/analysis/fastest-lap-candidates` with query params: last_n_races (default 12), session_key (optional), include_circuit_history (bool, default false)
+- [x] 5.4 Write unit tests covering: standard request, SC exclusion, tied FL, fresh tyre detection, circuit history
 
 ## 6. Overtake Profile Service + Route
 
