@@ -50,10 +50,16 @@ export class LapwiseStack extends cdk.Stack {
     apiLogGroup.grantWrite(new iam.ServicePrincipal('apigateway.amazonaws.com'));
 
     // ── JWT authorizer backed by Cognito (task 4.5) ───────────────────────────
+    // Support optional M2M client B (Gateway→Lapwise hop) via env var (task 3.5)
+    const m2mClientBId = process.env.LAPWISE_M2M_CLIENT_B_ID;
+    const jwtAudience = m2mClientBId
+      ? [userPoolClient.userPoolClientId, m2mClientBId]
+      : [userPoolClient.userPoolClientId];
+
     const jwtAuthorizer = new HttpJwtAuthorizer(
       'CognitoAuthorizer',
       `https://cognito-idp.${this.region}.amazonaws.com/${userPool.userPoolId}`,
-      { jwtAudience: [userPoolClient.userPoolClientId] },
+      { jwtAudience },
     );
 
     // ── HTTP API — default authorizer covers all routes (tasks 4.4, 4.6) ─────
@@ -81,6 +87,22 @@ export class LapwiseStack extends cdk.Stack {
       path: '/healthz',
       methods: [apigwv2.HttpMethod.GET],
       integration: new HttpLambdaIntegration('HealthzIntegration', fn),
+      authorizer: new apigwv2.HttpNoneAuthorizer(),
+    });
+
+    // ── /openapi.json and /docs exempt from auth (tasks 2.1) ─────────────────
+    // AgentCore Gateway fetches /openapi.json without a token to build its tool catalog
+    api.addRoutes({
+      path: '/openapi.json',
+      methods: [apigwv2.HttpMethod.GET],
+      integration: new HttpLambdaIntegration('OpenApiJsonIntegration', fn),
+      authorizer: new apigwv2.HttpNoneAuthorizer(),
+    });
+
+    api.addRoutes({
+      path: '/docs',
+      methods: [apigwv2.HttpMethod.GET],
+      integration: new HttpLambdaIntegration('DocsIntegration', fn),
       authorizer: new apigwv2.HttpNoneAuthorizer(),
     });
 

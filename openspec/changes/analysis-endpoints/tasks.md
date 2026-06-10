@@ -1,24 +1,24 @@
 ## 1. Shared Analysis Utility
 
-- [ ] 1.1 Create `service/src/lapwise/services/analysis/__init__.py`
-- [ ] 1.2 Implement `get_last_n_meeting_keys(client, n, year, circuit_key, year_range)` in `service/src/lapwise/services/analysis/common.py` — fetches meetings, sorts by date descending, slices to N, supports circuit_key + year_range merge with deduplication
-- [ ] 1.3 Implement `get_sessions_for_meetings(client, meeting_keys, session_types)` in `common.py` — parallel fetch via asyncio.gather, excludes is_cancelled=True sessions
-- [ ] 1.4 Define `SC_LAP_EXCLUSION_THRESHOLD = 1.10` constant in `common.py`
-- [ ] 1.5 Write unit tests for `get_last_n_meeting_keys` covering: basic N slice, circuit_key filter, year_range merge, deduplication
-- [ ] 1.6 Write unit tests for `get_sessions_for_meetings` covering: session_type filter, cancelled session exclusion, parallel fetch
+- [x] 1.1 Create `service/src/lapwise/services/analysis/__init__.py`
+- [x] 1.2 Implement `get_last_n_meeting_keys(client, n, year, circuit_key, year_range)` in `service/src/lapwise/services/analysis/common.py` — fetches meetings, sorts by date descending, slices to N, supports circuit_key + year_range merge with deduplication
+- [x] 1.3 Implement `get_sessions_for_meetings(client, meeting_keys, session_types)` in `common.py` — parallel fetch via asyncio.gather, excludes is_cancelled=True sessions
+- [x] 1.4 Define `SC_LAP_EXCLUSION_THRESHOLD = 1.10` constant in `common.py`
+- [x] 1.5 Write unit tests for `get_last_n_meeting_keys` covering: basic N slice, circuit_key filter, year_range merge, deduplication
+- [x] 1.6 Write unit tests for `get_sessions_for_meetings` covering: session_type filter, cancelled session exclusion, parallel fetch
 
 ## 2. Pydantic Response Models
 
-- [ ] 2.1 Create `service/src/lapwise/models/analysis/__init__.py`
-- [ ] 2.2 Add `DriverPaceProfile` model in `service/src/lapwise/models/analysis/driver_pace.py` — all fields from spec including nested sector_dominance structure
-- [ ] 2.3 Add `DnfRates` and `DnfBreakdown` models in `service/src/lapwise/models/analysis/dnf_rates.py`
-- [ ] 2.4 Add `FastestLapCandidate` model in `service/src/lapwise/models/analysis/fastest_lap.py`
-- [ ] 2.5 Add `OvertakeProfile` model in `service/src/lapwise/models/analysis/overtake_profile.py`
-- [ ] 2.6 Add `CircuitProfile` model in `service/src/lapwise/models/analysis/circuit_profile.py`
-- [ ] 2.7 Add `ChampionshipContext`, `DriverChampionshipContext`, `ConstructorChampionshipContext` models in `service/src/lapwise/models/analysis/championship_context.py`
-- [ ] 2.8 Add `QualifyingTrends` and `SectorDominance` models in `service/src/lapwise/models/analysis/qualifying_trends.py`
-- [ ] 2.9 Add `ConstructorPitstop` model in `service/src/lapwise/models/analysis/constructor_pitstop.py`
-- [ ] 2.10 Add `FantasyPrices`, `DriverPrice`, `ConstructorPrice` models in `service/src/lapwise/models/fantasy_prices.py`
+- [x] 2.1 Create `service/src/lapwise/models/analysis/__init__.py`
+- [x] 2.2 Add `DriverPaceProfile` model in `service/src/lapwise/models/analysis/driver_pace.py` — all fields from spec including nested sector_dominance structure
+- [x] 2.3 Add `DnfRates` and `DnfBreakdown` models in `service/src/lapwise/models/analysis/dnf_rates.py`
+- [x] 2.4 Add `FastestLapCandidate` model in `service/src/lapwise/models/analysis/fastest_lap.py`
+- [x] 2.5 Add `OvertakeProfile` model in `service/src/lapwise/models/analysis/overtake_profile.py`
+- [x] 2.6 Add `CircuitProfile` model in `service/src/lapwise/models/analysis/circuit_profile.py`
+- [x] 2.7 Add `ChampionshipContext`, `DriverChampionshipContext`, `ConstructorChampionshipContext` models in `service/src/lapwise/models/analysis/championship_context.py`
+- [x] 2.8 Add `QualifyingTrends` and `SectorDominance` models in `service/src/lapwise/models/analysis/qualifying_trends.py`
+- [x] 2.9 Add `ConstructorPitstop` model in `service/src/lapwise/models/analysis/constructor_pitstop.py`
+- [x] 2.10 Add `FantasyPrices`, `DriverPrice`, `ConstructorPrice` models in `service/src/lapwise/models/fantasy_prices.py`
 
 ## 3. Driver Pace Profile Service + Route
 

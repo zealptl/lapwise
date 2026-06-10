@@ -11,6 +11,7 @@ from lapwise.clients.openf1 import OpenF1Client
 from lapwise.config import get_settings
 from lapwise.models.common import ErrorEnvelope
 from lapwise.routes.analysis import router as analysis_router
+from lapwise.routes.fantasy import router as fantasy_router
 from lapwise.routes.v1 import router as v1_router
 
 _OPENAPI_TAGS: list[dict[str, str]] = [
@@ -26,8 +27,17 @@ _OPENAPI_TAGS: list[dict[str, str]] = [
         "name": "Analysis",
         "description": (
             "Derived and computed endpoints that combine multiple OpenF1 resources "
-            "to produce higher-level insights (e.g. stint comparisons, race pace analysis). "
-            "Reserved for future capabilities."
+            "to produce higher-level F1 Fantasy insights: driver pace, DNF rates, "
+            "fastest-lap candidates, overtake profiles, circuit profiles, championship "
+            "context, qualifying trends, and constructor pit stop performance."
+        ),
+    },
+    {
+        "name": "Fantasy",
+        "description": (
+            "F1 Fantasy pricing and recommendation data. Provides the 2025 season "
+            "driver and constructor prices used by the LapwiseF1Agent to construct "
+            "budget-constrained team recommendations."
         ),
     },
 ]
@@ -75,6 +85,7 @@ def create_app() -> FastAPI:
     # ── Routers ───────────────────────────────────────────────────────────────
     app.include_router(v1_router)
     app.include_router(analysis_router)
+    app.include_router(fantasy_router)
 
     # ── Exception handlers ────────────────────────────────────────────────────
     @app.exception_handler(UpstreamError)

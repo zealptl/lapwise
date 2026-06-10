@@ -1,33 +1,26 @@
-"""Pydantic response model for the fastest lap candidates analysis endpoint."""
+"""Pydantic models for fastest lap candidate analysis."""
 
 from pydantic import BaseModel, Field
 
 
 class FastestLapCandidate(BaseModel):
-    """Per-driver fastest lap probability metrics derived from historical Race and Sprint sessions."""
+    """Fastest lap statistics for a driver across race sessions."""
 
-    driver_number: int = Field(description="Car number of the driver.")
+    driver_number: int = Field(description="Official driver racing number.")
     fastest_lap_count: int = Field(
-        description="Number of sessions where this driver set the fastest eligible lap."
+        description="Number of sessions where driver set the fastest lap."
     )
     total_sessions: int = Field(
-        description="Total number of Race and Sprint sessions in the sample."
+        description="Total race and sprint sessions in sample."
     )
     fl_rate: float = Field(
-        description="Fastest lap rate: fastest_lap_count / total_sessions (0.0–1.0)."
+        description="Proportion of sessions where driver set the fastest lap."
     )
     typical_fl_position: float | None = Field(
-        default=None,
-        description=(
-            "Average finishing position (from session_result.position) in sessions "
-            "where this driver set the fastest lap. Null if no FL recorded."
-        ),
+        default=None, description="Avg finishing position in sessions where driver set fastest lap."
     )
     fl_on_fresh_tyre_rate: float | None = Field(
         default=None,
-        description=(
-            "Proportion of FL sessions where the fastest lap was set on a fresh tyre "
-            "(tyre_age <= 2). Null if no FL recorded."
-        ),
+        description="Proportion of fastest laps set on fresh (low tyre_age) tyres.",
     )
     sample_races: int = Field(description="Number of race weekends included in the sample.")
