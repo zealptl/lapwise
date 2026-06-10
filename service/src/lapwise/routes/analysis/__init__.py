@@ -13,9 +13,9 @@ from lapwise.models.analysis import (
     DnfRates,
     DriverPaceProfile,
     FastestLapCandidate,
-    OvertakeProfile,
     QualifyingTrend,
 )
+from lapwise.routes.v1.analysis import overtake_profile as overtake_profile_router
 from lapwise.services.analysis import AnalysisService
 from lapwise.services.analysis.championship_context import ChampionshipContextService
 
@@ -24,6 +24,9 @@ router = APIRouter(
     tags=["Analysis"],
     dependencies=[Depends(get_auth)],
 )
+
+# Spec-compliant overtake profile endpoint (tasks 6.1–6.3)
+router.include_router(overtake_profile_router.router)
 
 
 @router.get(
@@ -101,24 +104,6 @@ async def get_fastest_lap_candidates(
     year: Annotated[int, Query(description="Most-recent championship year to include.")],
 ) -> list[FastestLapCandidate]:
     return await svc.get_fastest_lap_candidates(circuit_key=circuit_key, year=year)
-
-
-@router.get(
-    "/overtake-profile",
-    response_model=list[OvertakeProfile],
-    summary="Overtake profile",
-    description=(
-        "Aggregate overtakes made and average positions gained per driver at a circuit. "
-        "Positions gained is calculated as grid position minus final classified position "
-        "(positive = moved forward). Results are ordered by overtakes made descending."
-    ),
-)
-async def get_overtake_profile(
-    svc: Annotated[AnalysisService, Depends(get_analysis_service)],
-    circuit_key: Annotated[int, Query(description="OpenF1 circuit identifier.")],
-    year: Annotated[int, Query(description="Championship year.")],
-) -> list[OvertakeProfile]:
-    return await svc.get_overtake_profile(circuit_key=circuit_key, year=year)
 
 
 @router.get(

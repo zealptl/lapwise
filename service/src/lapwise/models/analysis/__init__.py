@@ -1,1 +1,1 @@
-"""Pydantic models for computed / derived analysis endpoints."""
+"""Analysis response models."""
