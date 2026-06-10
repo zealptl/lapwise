@@ -4,7 +4,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from lapwise.deps import get_analysis_service, get_auth
+from lapwise.clients.openf1 import OpenF1Client
+from lapwise.deps import get_analysis_service, get_auth, get_openf1_client
 from lapwise.models.analysis import (
     ChampionshipContext,
     CircuitProfile,
@@ -12,16 +13,21 @@ from lapwise.models.analysis import (
     DnfRates,
     DriverPaceProfile,
     FastestLapCandidate,
-    OvertakeProfile,
     QualifyingTrend,
 )
+from lapwise.routes.v1.analysis import overtake_profile as overtake_profile_router
 from lapwise.services.analysis import AnalysisService
+from lapwise.services.analysis.championship_context import ChampionshipContextService
+from lapwise.services.analysis.constructor_pitstop import ConstructorPitstopService
 
 router = APIRouter(
     prefix="/v1/analysis",
     tags=["Analysis"],
     dependencies=[Depends(get_auth)],
 )
+
+# Spec-compliant overtake profile endpoint (tasks 6.1–6.3)
+router.include_router(overtake_profile_router.router)
 
 
 @router.get(
@@ -102,24 +108,6 @@ async def get_fastest_lap_candidates(
 
 
 @router.get(
-    "/overtake-profile",
-    response_model=list[OvertakeProfile],
-    summary="Overtake profile",
-    description=(
-        "Aggregate overtakes made and average positions gained per driver at a circuit. "
-        "Positions gained is calculated as grid position minus final classified position "
-        "(positive = moved forward). Results are ordered by overtakes made descending."
-    ),
-)
-async def get_overtake_profile(
-    svc: Annotated[AnalysisService, Depends(get_analysis_service)],
-    circuit_key: Annotated[int, Query(description="OpenF1 circuit identifier.")],
-    year: Annotated[int, Query(description="Championship year.")],
-) -> list[OvertakeProfile]:
-    return await svc.get_overtake_profile(circuit_key=circuit_key, year=year)
-
-
-@router.get(
     "/circuit-profile",
     response_model=CircuitProfile,
     summary="Circuit profile",
@@ -143,19 +131,30 @@ async def get_circuit_profile(
     response_model=ChampionshipContext,
     summary="Championship context",
     description=(
-        "Return the current driver and constructor championship standings for a given year. "
-        "Data is sourced from the most-recent championship update per driver/team."
+        "Return championship context for drivers and constructors including momentum "
+        "(POSITIVE/NEUTRAL/NEGATIVE), desperation index (0–100), and constructor battle flags. "
+        "Optionally filter to standings as of a specific meeting via `after_round`."
     ),
 )
 async def get_championship_context(
-    svc: Annotated[AnalysisService, Depends(get_analysis_service)],
-    year: Annotated[int, Query(description="Championship year.")],
-    last_n_races: Annotated[
-        int,
-        Query(description="Included for API consistency; not yet used in standings computation."),
-    ] = 5,
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+    season: Annotated[
+        int | None,
+        Query(description="Championship year. Defaults to the current calendar year."),
+    ] = None,
+    after_round: Annotated[
+        int | None,
+        Query(
+            description=(
+                "Return standings after this meeting_key. Only meetings with "
+                "meeting_key <= after_round are included in the calculation."
+            )
+        ),
+    ] = None,
 ) -> ChampionshipContext:
-    return await svc.get_championship_context(year=year, last_n_races=last_n_races)
+    """Return a full championship context snapshot for drivers and constructors."""
+    service = ChampionshipContextService(client)
+    return await service.get_championship_context(season, after_round)
 
 
 @router.get(
@@ -181,14 +180,24 @@ async def get_qualifying_trends(
     response_model=list[ConstructorPitstop],
     summary="Constructor pit stop performance",
     description=(
-        "Return per-constructor pit stop statistics at a circuit: average stationary "
-        "duration (ms), average stops per race, and threshold frequency breakdown "
-        "(sub-2 s and sub-3 s). Results sorted by average duration ascending."
+        "Return per-constructor pit stop statistics including F1 Fantasy bracket scoring, "
+        "fastest pitstop rate, sub-2s rate, and consistency score across recent race weekends."
     ),
 )
 async def get_constructor_pitstop(
-    svc: Annotated[AnalysisService, Depends(get_analysis_service)],
-    circuit_key: Annotated[int, Query(description="OpenF1 circuit identifier.")],
-    year: Annotated[int, Query(description="Championship year.")],
+    client: Annotated[OpenF1Client, Depends(get_openf1_client)],
+    team_name: Annotated[
+        str | None,
+        Query(description="Filter results to a single constructor by team name."),
+    ] = None,
+    last_n_races: Annotated[
+        int,
+        Query(description="Number of recent race weekends to include in the sample.", ge=1),
+    ] = 12,
+    include_circuit_history: Annotated[
+        bool,
+        Query(description="Reserved: currently falls back to last_n_races behaviour."),
+    ] = False,
 ) -> list[ConstructorPitstop]:
-    return await svc.get_constructor_pitstop(circuit_key=circuit_key, year=year)
+    service = ConstructorPitstopService(client)
+    return await service.get_constructor_pitstops(team_name, last_n_races, include_circuit_history)
