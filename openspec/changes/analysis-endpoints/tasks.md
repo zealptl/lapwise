@@ -86,10 +86,10 @@
 
 ## 12. Route Registration
 
-- [ ] 12.1 Register all analysis routes in `service/src/lapwise/routes/v1/__init__.py` under `/v1/analysis/` prefix
-- [ ] 12.2 Register fantasy prices route under `/v1/fantasy/` prefix
-- [ ] 12.3 Verify all new routes appear in FastAPI's auto-generated `/openapi.json`
-- [ ] 12.4 Confirm existing routes are unaffected (run existing test suite)
+- [x] 12.1 Register all analysis routes in `service/src/lapwise/routes/v1/__init__.py` under `/v1/analysis/` prefix
+- [x] 12.2 Register fantasy prices route under `/v1/fantasy/` prefix
+- [x] 12.3 Verify all new routes appear in FastAPI's auto-generated `/openapi.json`
+- [x] 12.4 Confirm existing routes are unaffected (run existing test suite)
 
 ## 13. Integration Testing
 
