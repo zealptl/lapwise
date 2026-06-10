@@ -11,7 +11,7 @@ from lapwise.clients.openf1 import OpenF1Client
 from lapwise.config import get_settings
 from lapwise.models.common import ErrorEnvelope
 from lapwise.routes.analysis import router as analysis_router
-from lapwise.routes.v1 import router as v1_router
+from lapwise.routes.v1 import fantasy_router, router as v1_router
 
 _OPENAPI_TAGS: list[dict[str, str]] = [
     {
@@ -74,6 +74,7 @@ def create_app() -> FastAPI:
 
     # ── Routers ───────────────────────────────────────────────────────────────
     app.include_router(v1_router)
+    app.include_router(fantasy_router)
     app.include_router(analysis_router)
 
     # ── Exception handlers ────────────────────────────────────────────────────
