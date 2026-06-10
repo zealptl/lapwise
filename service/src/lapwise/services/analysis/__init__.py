@@ -1,1 +1,1 @@
-"""Analysis services — derived and computed data from OpenF1 resources."""
+"""Analysis services — derived and computed endpoints."""

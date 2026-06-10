@@ -44,10 +44,10 @@
 
 ## 6. Overtake Profile Service + Route
 
-- [ ] 6.1 Implement `service/src/lapwise/services/analysis/overtake_profile.py` — Race + Sprint sessions, per-driver overtakes_made and overtakes_lost, aggression_score as percentile rank vs field, circuit_overtake_avg when circuit filter active
-- [ ] 6.2 Sprint weekend session count: each session (Race + Sprint) counted separately in total_races denominator
-- [ ] 6.3 Create `service/src/lapwise/routes/v1/analysis/overtake_profile.py` — `GET /v1/analysis/overtake-profile` with query params: driver_number (optional), last_n_races (default 12), session_key (optional), include_circuit_history (bool, default false)
-- [ ] 6.4 Write unit tests covering: all drivers, single driver, zero overtakes, sprint session counting, circuit_overtake_avg population
+- [x] 6.1 Implement `service/src/lapwise/services/analysis/overtake_profile.py` — Race + Sprint sessions, per-driver overtakes_made and overtakes_lost, aggression_score as percentile rank vs field, circuit_overtake_avg when circuit filter active
+- [x] 6.2 Sprint weekend session count: each session (Race + Sprint) counted separately in total_races denominator
+- [x] 6.3 Create `service/src/lapwise/routes/v1/analysis/overtake_profile.py` — `GET /v1/analysis/overtake-profile` with query params: driver_number (optional), last_n_races (default 12), session_key (optional), include_circuit_history (bool, default false)
+- [x] 6.4 Write unit tests covering: all drivers, single driver, zero overtakes, sprint session counting, circuit_overtake_avg population
 
 ## 7. Circuit Profile Service + Route
 

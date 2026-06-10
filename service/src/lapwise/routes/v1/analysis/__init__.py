@@ -1,1 +1,1 @@
-"""Analysis routes under /v1/analysis/."""
+"""Analysis sub-routes under /v1/analysis/."""
