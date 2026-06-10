@@ -30,10 +30,10 @@
 
 ## 4. DNF Rates Service + Route
 
-- [ ] 4.1 Implement `service/src/lapwise/services/analysis/dnf_rates.py` — competitive sessions only (Qualifying + Race + Sprint), per-driver counts, breakdown by session_type, reliability_score calculation
-- [ ] 4.2 Handle driver absence: only count sessions where a session_result record exists for the driver
-- [ ] 4.3 Create `service/src/lapwise/routes/v1/analysis/dnf_rates.py` — `GET /v1/analysis/dnf-rates` with query params: driver_number (optional), season (default current), last_n_races (default 12)
-- [ ] 4.4 Write unit tests covering: all drivers, single driver, zero DNFs, sprint inclusion, absent driver handling
+- [x] 4.1 Implement `service/src/lapwise/services/analysis/dnf_rates.py` — competitive sessions only (Qualifying + Race + Sprint), per-driver counts, breakdown by session_type, reliability_score calculation
+- [x] 4.2 Handle driver absence: only count sessions where a session_result record exists for the driver
+- [x] 4.3 Create `service/src/lapwise/routes/v1/analysis/dnf_rates.py` — `GET /v1/analysis/dnf-rates` with query params: driver_number (optional), season (default current), last_n_races (default 12)
+- [x] 4.4 Write unit tests covering: all drivers, single driver, zero DNFs, sprint inclusion, absent driver handling
 
 ## 5. Fastest Lap Candidates Service + Route
 
