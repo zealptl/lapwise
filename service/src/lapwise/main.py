@@ -84,8 +84,8 @@ def create_app() -> FastAPI:
 
     # ── Routers ───────────────────────────────────────────────────────────────
     app.include_router(v1_router)
-    app.include_router(analysis_router)
     app.include_router(fantasy_router)
+    app.include_router(analysis_router)
 
     # ── Exception handlers ────────────────────────────────────────────────────
     @app.exception_handler(UpstreamError)

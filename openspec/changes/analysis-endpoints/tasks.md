@@ -79,10 +79,10 @@
 
 ## 11. Fantasy Prices Route
 
-- [ ] 11.1 Create `service/src/lapwise/routes/v1/fantasy/__init__.py`
-- [ ] 11.2 Create `service/src/lapwise/routes/v1/fantasy/prices.py` with hardcoded 2025 price dict — all 20 drivers and 10 constructors; include date-last-updated comment and TODO for dynamic pricing
-- [ ] 11.3 Register `GET /v1/fantasy/prices` route — no auth required, returns FantasyPrices model
-- [ ] 11.4 Write unit test: response contains 20 drivers, 10 constructors, all prices between 3.0 and 34.0
+- [x] 11.1 Create `service/src/lapwise/routes/v1/fantasy/__init__.py`
+- [x] 11.2 Create `service/src/lapwise/routes/v1/fantasy/prices.py` with hardcoded 2025 price dict — all 20 drivers and 10 constructors; include date-last-updated comment and TODO for dynamic pricing
+- [x] 11.3 Register `GET /v1/fantasy/prices` route — no auth required, returns FantasyPrices model
+- [x] 11.4 Write unit test: response contains 20 drivers, 10 constructors, all prices between 3.0 and 34.0
 
 ## 12. Route Registration
 
