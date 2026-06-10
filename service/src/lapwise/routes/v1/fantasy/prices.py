@@ -6,9 +6,62 @@ TODO: Update after each race week when official prices change.
 
 from fastapi import APIRouter
 
+from lapwise.models.common import ErrorEnvelope
 from lapwise.models.fantasy_prices import ConstructorPrice, DriverPrice, FantasyPrices
 
 router = APIRouter()
+
+_DESCRIPTION = (
+    "Returns the current 2025 F1 Fantasy driver and constructor price list.\n\n"
+    "Prices are **static** — they are hand-authored in the service and updated manually "
+    "after each official F1 Fantasy price revision (typically once per race week). "
+    "The `last_updated` field records the date of the most recent update in `YYYY-MM-DD` format.\n\n"
+    "Driver prices range from approximately **£5.5 M** (budget picks) to **£30 M** (elite), "
+    "and constructor prices from **£7.5 M** to **£33.5 M**. Every valid F1 Fantasy squad must "
+    "total no more than £100 M across 5 drivers and 2 constructors.\n\n"
+    "No authentication is required. This endpoint never calls upstream APIs and will not "
+    "return 502 or 504 errors."
+)
+
+_200_EXAMPLE = {
+    "season": 2025,
+    "last_updated": "2025-06-09",
+    "drivers": [
+        {
+            "driver_number": 1,
+            "full_name": "Max Verstappen",
+            "team_name": "Red Bull Racing",
+            "price_millions": 30.0,
+        },
+        {
+            "driver_number": 4,
+            "full_name": "Lando Norris",
+            "team_name": "McLaren",
+            "price_millions": 28.5,
+        },
+        {
+            "driver_number": 16,
+            "full_name": "Charles Leclerc",
+            "team_name": "Ferrari",
+            "price_millions": 26.5,
+        },
+    ],
+    "constructors": [
+        {"team_name": "McLaren", "price_millions": 33.5},
+        {"team_name": "Ferrari", "price_millions": 31.0},
+    ],
+}
+
+_RESPONSES: dict[int | str, dict[str, object]] = {
+    200: {
+        "description": "Current F1 Fantasy price list for the 2025 season.",
+        "content": {"application/json": {"example": _200_EXAMPLE}},
+    },
+    422: {
+        "description": "Validation error — unexpected query parameter type.",
+        "model": ErrorEnvelope,
+    },
+}
 
 _PRICES_2025 = FantasyPrices(
     season=2025,
@@ -54,7 +107,8 @@ _PRICES_2025 = FantasyPrices(
     "/prices",
     response_model=FantasyPrices,
     summary="F1 Fantasy prices",
-    description="Returns the current 2025 F1 Fantasy driver and constructor price list. No authentication required.",
+    description=_DESCRIPTION,
+    responses=_RESPONSES,
 )
 async def fantasy_prices() -> FantasyPrices:
     """Return the hardcoded 2025 F1 Fantasy price list."""
