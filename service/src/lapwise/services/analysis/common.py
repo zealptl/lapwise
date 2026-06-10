@@ -1,6 +1,7 @@
 """Shared utilities for analysis services."""
+
 import asyncio
-from datetime import datetime
+from typing import Any
 
 from lapwise.clients.openf1 import OpenF1Client
 from lapwise.models.meetings import Meeting
@@ -16,45 +17,42 @@ async def get_last_n_meeting_keys(
     circuit_key: int | None = None,
     year_range: tuple[int, int] | None = None,
 ) -> list[int]:
-    """Return the meeting_keys for the last N meetings, most recent first.
+    """Return the last N meeting keys, sorted by date descending.
 
     Args:
-        client: The OpenF1 API client.
-        n: Number of most recent meetings to return.
-        year: Optional year filter for the base query.
-        circuit_key: Optional circuit key for historical range queries.
-        year_range: Optional (start, end) year range used together with circuit_key
-            to fetch additional historical meetings.
+        client: OpenF1 HTTP client.
+        n: Maximum number of meeting keys to return.
+        year: If provided, restrict to this calendar year.
+        circuit_key: If provided, restrict to this circuit.
+        year_range: If provided, a (start_year, end_year) tuple used to merge
+            additional meetings from a specific date range (inclusive).
 
     Returns:
-        List of meeting_key integers, sorted by date_start descending, length <= n.
+        A list of up to N meeting_key integers, sorted most-recent first.
     """
-    filters: dict = {}
+    filters: dict[str, Any] = {}
     if year is not None:
         filters["year"] = year
+    if circuit_key is not None:
+        filters["circuit_key"] = circuit_key
 
     meetings: list[Meeting] = await client.get("meetings", Meeting, **filters)
 
-    if circuit_key is not None and year_range is not None:
-        start, end = year_range
-        extra_meetings_lists = await asyncio.gather(
-            *[
-                client.get("meetings", Meeting, year=y, circuit_key=circuit_key)
-                for y in range(start, end + 1)
-            ]
-        )
-        seen_keys: set[int] = {m.meeting_key for m in meetings}
-        for extra_list in extra_meetings_lists:
-            for m in extra_list:
-                if m.meeting_key not in seen_keys:
-                    meetings.append(m)
-                    seen_keys.add(m.meeting_key)
+    if year_range is not None:
+        start_year, end_year = year_range
+        range_filters: dict[str, Any] = {"year_gte": start_year, "year_lte": end_year}
+        if circuit_key is not None:
+            range_filters["circuit_key"] = circuit_key
+        extra: list[Meeting] = await client.get("meetings", Meeting, **range_filters)
+        # Merge with deduplication by meeting_key
+        existing_keys = {m.meeting_key for m in meetings}
+        for m in extra:
+            if m.meeting_key not in existing_keys:
+                meetings.append(m)
+                existing_keys.add(m.meeting_key)
 
-    meetings.sort(
-        key=lambda m: m.date_start if m.date_start is not None else datetime.min,
-        reverse=True,
-    )
-
+    # Sort by date descending (most recent first), slice to N
+    meetings.sort(key=lambda m: m.date_start or "", reverse=True)
     return [m.meeting_key for m in meetings[:n]]
 
 
@@ -63,27 +61,32 @@ async def get_sessions_for_meetings(
     meeting_keys: list[int],
     session_types: list[str],
 ) -> list[Session]:
-    """Return sessions for the given meetings, filtered by session type.
+    """Fetch sessions for the given meeting keys, filtered by session type.
 
-    Fetches sessions for each meeting key in parallel and returns those whose
-    session_type is in session_types and that are not cancelled.
+    Fetches in parallel and excludes cancelled sessions.
 
     Args:
-        client: The OpenF1 API client.
-        meeting_keys: List of meeting keys to fetch sessions for.
-        session_types: Allowed session type values (e.g. ["Race", "Qualifying"]).
+        client: OpenF1 HTTP client.
+        meeting_keys: List of meeting_key values to fetch sessions for.
+        session_types: List of session_type values to include (e.g. ["Race", "Sprint"]).
 
     Returns:
-        Flat list of matching, non-cancelled Session instances.
+        A flat list of non-cancelled Session instances matching the given types.
     """
-    results: tuple[list[Session], ...] = await asyncio.gather(
-        *[client.get("sessions", Session, meeting_key=mk) for mk in meeting_keys]
-    )
+    if not meeting_keys:
+        return []
+
+    async def fetch_for_meeting(meeting_key: int) -> list[Session]:
+        return await client.get("sessions", Session, meeting_key=meeting_key)
+
+    results = await asyncio.gather(*[fetch_for_meeting(mk) for mk in meeting_keys])
 
     sessions: list[Session] = []
     for session_list in results:
-        for s in session_list:
-            if s.session_type in session_types and not s.is_cancelled:
-                sessions.append(s)
+        for session in session_list:
+            if session.is_cancelled:
+                continue
+            if session.session_type in session_types:
+                sessions.append(session)
 
     return sessions
