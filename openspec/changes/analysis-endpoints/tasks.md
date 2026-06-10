@@ -9,16 +9,16 @@
 
 ## 2. Pydantic Response Models
 
-- [ ] 2.1 Create `service/src/lapwise/models/analysis/__init__.py`
-- [ ] 2.2 Add `DriverPaceProfile` model in `service/src/lapwise/models/analysis/driver_pace.py` — all fields from spec including nested sector_dominance structure
-- [ ] 2.3 Add `DnfRates` and `DnfBreakdown` models in `service/src/lapwise/models/analysis/dnf_rates.py`
-- [ ] 2.4 Add `FastestLapCandidate` model in `service/src/lapwise/models/analysis/fastest_lap.py`
-- [ ] 2.5 Add `OvertakeProfile` model in `service/src/lapwise/models/analysis/overtake_profile.py`
-- [ ] 2.6 Add `CircuitProfile` model in `service/src/lapwise/models/analysis/circuit_profile.py`
-- [ ] 2.7 Add `ChampionshipContext`, `DriverChampionshipContext`, `ConstructorChampionshipContext` models in `service/src/lapwise/models/analysis/championship_context.py`
-- [ ] 2.8 Add `QualifyingTrends` and `SectorDominance` models in `service/src/lapwise/models/analysis/qualifying_trends.py`
-- [ ] 2.9 Add `ConstructorPitstop` model in `service/src/lapwise/models/analysis/constructor_pitstop.py`
-- [ ] 2.10 Add `FantasyPrices`, `DriverPrice`, `ConstructorPrice` models in `service/src/lapwise/models/fantasy_prices.py`
+- [x] 2.1 Create `service/src/lapwise/models/analysis/__init__.py`
+- [x] 2.2 Add `DriverPaceProfile` model in `service/src/lapwise/models/analysis/driver_pace.py` — all fields from spec including nested sector_dominance structure
+- [x] 2.3 Add `DnfRates` and `DnfBreakdown` models in `service/src/lapwise/models/analysis/dnf_rates.py`
+- [x] 2.4 Add `FastestLapCandidate` model in `service/src/lapwise/models/analysis/fastest_lap.py`
+- [x] 2.5 Add `OvertakeProfile` model in `service/src/lapwise/models/analysis/overtake_profile.py`
+- [x] 2.6 Add `CircuitProfile` model in `service/src/lapwise/models/analysis/circuit_profile.py`
+- [x] 2.7 Add `ChampionshipContext`, `DriverChampionshipContext`, `ConstructorChampionshipContext` models in `service/src/lapwise/models/analysis/championship_context.py`
+- [x] 2.8 Add `QualifyingTrends` and `SectorDominance` models in `service/src/lapwise/models/analysis/qualifying_trends.py`
+- [x] 2.9 Add `ConstructorPitstop` model in `service/src/lapwise/models/analysis/constructor_pitstop.py`
+- [x] 2.10 Add `FantasyPrices`, `DriverPrice`, `ConstructorPrice` models in `service/src/lapwise/models/fantasy_prices.py`
 
 ## 3. Driver Pace Profile Service + Route
 
