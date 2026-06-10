@@ -19,6 +19,7 @@
   },
   "enabledPlugins": {
     "deploy-on-aws@claude-plugins-official": true,
-    "aws-agents@claude-plugins-official": true
+    "aws-agents@claude-plugins-official": true,
+    "aws-core@claude-plugins-official": true
   }
 }
