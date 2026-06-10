@@ -15,8 +15,8 @@
 
 ## 2. Lapwise API — OpenAPI Public Access
 
-- [ ] 2.1 In `infra/lib/lapwise-stack.ts`, add `HttpNoneAuthorizer` route overrides for `GET /openapi.json` and `GET /docs` (same pattern as the existing `/healthz` exemption on line 80); redeploy `infra/` — the AgentCore Gateway fetches `/openapi.json` without a token to build its tool catalog
-- [ ] 2.2 Add integration test asserting `GET /openapi.json` returns HTTP 200 without an Authorization header and that the response includes all new analysis and fantasy paths
+- [x] 2.1 In `infra/lib/lapwise-stack.ts`, add `HttpNoneAuthorizer` route overrides for `GET /openapi.json` and `GET /docs` (same pattern as the existing `/healthz` exemption on line 80); redeploy `infra/` — the AgentCore Gateway fetches `/openapi.json` without a token to build its tool catalog
+- [x] 2.2 Add integration test asserting `GET /openapi.json` returns HTTP 200 without an Authorization header and that the response includes all new analysis and fantasy paths
 
 ## 3. Cognito M2M App Clients
 
@@ -24,7 +24,7 @@
 - [ ] 3.2 Store client A `client_id` and `client_secret` in AWS Secrets Manager under `lapwise/agent/cognito-client-a`
 - [ ] 3.3 Create Cognito M2M app client B (Gateway→Lapwise) in the same User Pool: enable client credentials grant; assign Lapwise API resource server scopes
 - [ ] 3.4 Store client B `client_id` and `client_secret` in AWS Secrets Manager under `lapwise/agent/cognito-client-b`
-- [ ] 3.5 In `infra/lib/lapwise-stack.ts`, add client B's `userPoolClientId` to the `jwtAudience` array on `HttpJwtAuthorizer` (line 56) so Gateway→Lapwise tokens are accepted; redeploy `infra/`
+- [x] 3.5 In `infra/lib/lapwise-stack.ts`, add client B's `userPoolClientId` to the `jwtAudience` array on `HttpJwtAuthorizer` (line 56) so Gateway→Lapwise tokens are accepted; redeploy `infra/`
 - [ ] 3.6 Verify that a token issued by client A is NOT accepted by the Lapwise API Gateway authorizer (wrong audience); document in the agent README
 
 ## 4. AgentCore Infrastructure Setup
