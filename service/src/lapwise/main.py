@@ -1,5 +1,7 @@
 """Lapwise FastAPI application factory."""
 
+import logging
+import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -13,6 +15,12 @@ from lapwise.models.common import ErrorEnvelope
 from lapwise.routes.analysis import router as analysis_router
 from lapwise.routes.fantasy import router as fantasy_router
 from lapwise.routes.v1 import router as v1_router
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
+logger = logging.getLogger("lapwise.main")
 
 _OPENAPI_TAGS: list[dict[str, str]] = [
     {
@@ -52,6 +60,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
     client = OpenF1Client(settings)
     app.state.openf1_client = client
+    routes = [
+        f"{list(r.methods)} {r.path}"  # type: ignore[attr-defined]
+        for r in app.routes
+        if hasattr(r, "methods")
+    ]
+    logger.info("Lapwise starting up. Registered routes:\n%s", "\n".join(f"  {r}" for r in routes))
     try:
         yield
     finally:
@@ -81,6 +95,16 @@ def create_app() -> FastAPI:
         Does **not** contact the OpenF1 upstream.
         """
         return {"status": "ok"}
+
+    # ── Request logging middleware ─────────────────────────────────────────────
+    @app.middleware("http")
+    async def log_requests(request: Request, call_next):  # type: ignore[no-untyped-def]
+        start = time.monotonic()
+        logger.info("→ %s %s params=%s", request.method, request.url.path, dict(request.query_params))
+        response = await call_next(request)
+        elapsed_ms = (time.monotonic() - start) * 1000
+        logger.info("← %s %s %d (%.1fms)", request.method, request.url.path, response.status_code, elapsed_ms)
+        return response
 
     # ── Routers ───────────────────────────────────────────────────────────────
     app.include_router(v1_router)

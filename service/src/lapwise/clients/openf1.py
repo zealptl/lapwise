@@ -1,5 +1,8 @@
 """Async HTTP client for the OpenF1 API."""
 
+import asyncio
+import logging
+import time
 from typing import Any, TypeVar
 
 import httpx
@@ -9,8 +12,27 @@ from lapwise.clients.filters import translate_filters
 from lapwise.config import Settings
 
 T = TypeVar("T")
+logger = logging.getLogger("lapwise.clients.openf1")
 
 _BODY_EXCERPT_LIMIT = 300
+# OpenF1 enforces 3 requests/second; stay safely under that ceiling.
+_OPENF1_RATE_LIMIT = 3.0
+
+
+class _RateLimiter:
+    """Leaky-bucket rate limiter that spaces requests evenly across a 1-second window."""
+
+    def __init__(self, rate: float) -> None:
+        self._interval = 1.0 / rate
+        self._next_allowed: float = 0.0
+        self._lock = asyncio.Lock()
+
+    async def acquire(self) -> None:
+        async with self._lock:
+            now = time.monotonic()
+            if now < self._next_allowed:
+                await asyncio.sleep(self._next_allowed - now)
+            self._next_allowed = max(time.monotonic(), self._next_allowed) + self._interval
 
 
 class OpenF1Client:
@@ -18,6 +40,7 @@ class OpenF1Client:
         timeout = httpx.Timeout(settings.openf1_timeout_seconds)
         self._base_url = settings.openf1_base_url.rstrip("/")
         self._client = httpx.AsyncClient(timeout=timeout)
+        self._rate_limiter = _RateLimiter(_OPENF1_RATE_LIMIT)
 
     async def get(self, path: str, model: type[T], **filters: Any) -> list[T]:
         """Fetch a list of resources from OpenF1 and return parsed models.
@@ -38,14 +61,22 @@ class OpenF1Client:
             *translate_filters(dict(filters))
         ]
 
+        await self._rate_limiter.acquire()
+
+        logger.debug("GET %s params=%s", url, params)
+        t0 = time.monotonic()
         try:
             response = await self._client.get(url, params=params)
         except httpx.TimeoutException as exc:
+            logger.warning("GET %s timed out", url)
             raise UpstreamError("gateway_timeout") from exc
         except httpx.HTTPError as exc:
+            logger.warning("GET %s HTTP error: %s", url, exc)
             raise UpstreamError("bad_gateway") from exc
 
+        elapsed_ms = (time.monotonic() - t0) * 1000
         status = response.status_code
+        logger.debug("GET %s → %d (%.1fms)", url, status, elapsed_ms)
 
         if status >= 500:
             excerpt = response.text[:_BODY_EXCERPT_LIMIT]

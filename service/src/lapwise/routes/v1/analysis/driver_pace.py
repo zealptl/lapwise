@@ -1,5 +1,6 @@
 """GET /v1/analysis/driver-pace-profile — driver pace profile analysis."""
 
+import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
@@ -9,6 +10,8 @@ from lapwise.deps import get_openf1_client
 from lapwise.models.analysis.driver_pace import DriverPaceProfile
 from lapwise.models.common import ErrorEnvelope
 from lapwise.services.analysis.driver_pace import DriverPaceService
+
+logger = logging.getLogger("lapwise.routes.driver_pace")
 
 router = APIRouter()
 
@@ -130,7 +133,13 @@ async def driver_pace_profile(
     ] = False,
 ) -> DriverPaceProfile:
     """Return a multi-dimensional pace profile for the requested driver."""
+    logger.info(
+        "driver_pace_profile called driver_number=%d last_n_races=%d session_key=%s include_circuit_history=%s",
+        driver_number, last_n_races, session_key, include_circuit_history,
+    )
     service = DriverPaceService(client)
-    return await service.get_driver_pace_profile(
+    result = await service.get_driver_pace_profile(
         driver_number, last_n_races, session_key, include_circuit_history
     )
+    logger.info("driver_pace_profile completed sample_races=%d", result.sample_races)
+    return result
