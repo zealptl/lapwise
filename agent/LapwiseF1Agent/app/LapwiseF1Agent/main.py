@@ -7,6 +7,7 @@ import uuid
 
 from google.adk.agents import Agent
 from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
 from google.adk.tools import preload_memory
 
 from cognito import CognitoTokenCache
@@ -59,23 +60,29 @@ before making recommendations. If data is unavailable for a circuit/year, say so
 """
 
 
-def _load_gateway_tools(token_cache: CognitoTokenCache) -> list:
-    """Load tool definitions from AgentCore Gateway. Returns [] when gateway URL is not set."""
+def _load_gateway_toolset():
+    """Return an MCPToolset connected to AgentCore Gateway, or [] in dev mode."""
     if not GATEWAY_URL:
         logger.warning(
             "AGENTCORE_GATEWAY_LAPWISEGATEWAY_URL not set — skipping gateway tools (dev mode)"
         )
         return []
     try:
-        from bedrock_agentcore.gateway import GatewayClient  # type: ignore[import]
+        from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset
+        from google.adk.tools.mcp_tool.mcp_session_manager import StreamableHTTPConnectionParams
 
-        token = token_cache.get_token()
-        client = GatewayClient(gateway_url=GATEWAY_URL, token=token)
-        tools = client.list_tools()
-        logger.info("Loaded %d tools from AgentCore Gateway", len(tools))
-        return tools
+        token = _token_cache.get_token()
+        headers = {"Authorization": f"Bearer {token}"} if token else {}
+        toolset = MCPToolset(
+            connection_params=StreamableHTTPConnectionParams(
+                url=GATEWAY_URL,
+                headers=headers,
+            )
+        )
+        logger.info("Loaded MCPToolset from AgentCore Gateway: %s", GATEWAY_URL)
+        return [toolset]
     except Exception:
-        logger.warning("Failed to load gateway tools", exc_info=True)
+        logger.warning("Failed to load gateway toolset", exc_info=True)
         return []
 
 
@@ -100,41 +107,40 @@ async def persist_session_callback(callback_context) -> None:
 # Agent and runtime initialisation
 # ---------------------------------------------------------------------------
 
-# Token cache and memory are initialised without network calls at import time.
+# Token cache and memory initialised without network calls at import time.
 # CognitoTokenCache defers Secrets Manager fetch to first get_token() call.
-# Gateway tools are loaded lazily on first request to stay within the 30s cold-start limit.
+# Gateway toolset is loaded lazily on first request to stay within 30s cold-start limit.
 _token_cache = CognitoTokenCache()
 _memory_service = AgentCoreMemoryService(memory_id=MEMORY_ID, region_name=AWS_REGION)
 
-_gateway_tools_loaded = False
-_gateway_tools: list = []
+_gateway_toolset_loaded = False
+_gateway_toolset: list = []
+
+_model = "bedrock/us.anthropic.claude-sonnet-4-6"
+
+_root_agent: Agent | None = None
 
 
-def _ensure_gateway_tools() -> None:
-    global _gateway_tools_loaded, _gateway_tools
-    if not _gateway_tools_loaded:
-        _gateway_tools = _load_gateway_tools(_token_cache)
-        _gateway_tools_loaded = True
+def _ensure_gateway_toolset() -> None:
+    global _gateway_toolset_loaded, _gateway_toolset
+    if not _gateway_toolset_loaded:
+        _gateway_toolset = _load_gateway_toolset()
+        _gateway_toolset_loaded = True
 
 
-_model = (
-    "anthropic.claude-sonnet-4-6"
-    if os.getenv("AWS_LAMBDA_FUNCTION_NAME") or os.getenv("AGENTCORE_RUNTIME")
-    else "bedrock/anthropic.claude-sonnet-4-6"
-)
-
-root_agent = Agent(
-    name="LapwiseF1Agent",
-    model=_model,
-    instruction=SYSTEM_PROMPT,
-    tools=[preload_memory, save_user_preference],
-)
-root_agent.after_agent_callback = persist_session_callback
-
-
-def _get_agent() -> Agent:
-    _ensure_gateway_tools()
-    return root_agent
+def _get_root_agent() -> Agent:
+    global _root_agent
+    if _root_agent is None:
+        _ensure_gateway_toolset()
+        agent = Agent(
+            name="LapwiseF1Agent",
+            model=_model,
+            instruction=SYSTEM_PROMPT,
+            tools=[preload_memory, save_user_preference] + _gateway_toolset,
+        )
+        agent.after_agent_callback = persist_session_callback
+        _root_agent = agent
+    return _root_agent
 
 
 async def handle_session(
@@ -143,6 +149,7 @@ async def handle_session(
     user_id: str = "anonymous",
 ) -> str:
     """Run one user turn and return the agent's final response text."""
+
     sid = session_id or str(uuid.uuid4())
 
     try:
@@ -158,17 +165,18 @@ async def handle_session(
     logger.info(json.dumps({"event": "session_start", "session_id": sid, "user_id": user_id}))
 
     try:
-        agent = _get_agent()
+        session_service = InMemorySessionService()
         runner = Runner(
             app_name="LapwiseF1Agent",
-            agent=agent,
+            agent=_get_root_agent(),
+            session_service=session_service,
             memory_service=_memory_service,
         )
-        session = await runner.session_service.get_or_create_session(
+        await session_service.create_session(
             app_name="LapwiseF1Agent", user_id=user_id, session_id=sid
         )
 
-        from google.adk.types import Content, Part  # type: ignore[import]
+        from google.genai.types import Content, Part  # type: ignore[import]
 
         user_content = Content(role="user", parts=[Part(text=user_message)])
         result_text = ""
