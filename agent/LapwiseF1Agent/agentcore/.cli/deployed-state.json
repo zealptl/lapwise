@@ -1,0 +1,39 @@
+{
+  "targets": {
+    "default": {
+      "resources": {
+        "runtimes": {
+          "LapwiseF1Agent": {
+            "runtimeId": "LapwiseF1Agent_LapwiseF1Agent-1qe0X2A13C",
+            "runtimeArn": "arn:aws:bedrock-agentcore:us-east-1:515819869309:runtime/LapwiseF1Agent_LapwiseF1Agent-1qe0X2A13C",
+            "roleArn": "arn:aws:iam::515819869309:role/AgentCore-LapwiseF1Agent--ApplicationAgentLapwiseF1-32gsv5DtBz8V"
+          }
+        },
+        "memories": {
+          "LapwiseMemory": {
+            "memoryId": "LapwiseF1Agent_LapwiseMemory-BpEoUO9hnK",
+            "memoryArn": "arn:aws:bedrock-agentcore:us-east-1:515819869309:memory/LapwiseF1Agent_LapwiseMemory-BpEoUO9hnK"
+          }
+        },
+        "mcp": {
+          "gateways": {
+            "LapwiseGateway": {
+              "gatewayId": "lapwisef1agent-lapwisegateway-lly6n7e0uu",
+              "gatewayArn": "arn:aws:bedrock-agentcore:us-east-1:515819869309:gateway/lapwisef1agent-lapwisegateway-lly6n7e0uu",
+              "gatewayUrl": "https://lapwisef1agent-lapwisegateway-lly6n7e0uu.gateway.bedrock-agentcore.us-east-1.amazonaws.com/mcp"
+            }
+          }
+        },
+        "credentials": {
+          "LapwiseGatewayClientB": {
+            "credentialProviderArn": "arn:aws:bedrock-agentcore:us-east-1:515819869309:token-vault/default/oauth2credentialprovider/LapwiseGatewayClientB",
+            "clientSecretArn": "arn:aws:secretsmanager:us-east-1:515819869309:secret:bedrock-agentcore-identity!default/oauth2/LapwiseGatewayClientB-39ca654a-xVXkv7",
+            "callbackUrl": "https://bedrock-agentcore.us-east-1.amazonaws.com/identities/oauth2/callback/889a4829-2608-49a5-935e-e639987d417b"
+          }
+        },
+        "stackName": "AgentCore-LapwiseF1Agent-default",
+        "deployHash": "befa316b21bfccee"
+      }
+    }
+  }
+}

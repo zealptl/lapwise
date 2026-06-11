@@ -53,9 +53,22 @@ async def test_5xx_raises_bad_gateway() -> None:
 
 
 @respx.mock
-async def test_4xx_raises_forwarded() -> None:
+async def test_404_returns_empty_list() -> None:
     respx.get("https://api.openf1.org/v1/drivers").mock(
         return_value=httpx.Response(404, text="Not Found")
+    )
+
+    client = _make_client()
+    result = await client.get("drivers", _Driver)
+    await client.aclose()
+
+    assert result == []
+
+
+@respx.mock
+async def test_4xx_other_raises_forwarded() -> None:
+    respx.get("https://api.openf1.org/v1/drivers").mock(
+        return_value=httpx.Response(403, text="Forbidden")
     )
 
     client = _make_client()
@@ -65,7 +78,7 @@ async def test_4xx_raises_forwarded() -> None:
 
     err = exc_info.value
     assert err.category == "forwarded"
-    assert err.upstream_status == 404
+    assert err.upstream_status == 403
 
 
 @respx.mock

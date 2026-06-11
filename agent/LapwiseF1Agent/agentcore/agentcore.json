@@ -1,0 +1,100 @@
+{
+  "$schema": "https://schema.agentcore.aws.dev/v1/agentcore.json",
+  "name": "LapwiseF1Agent",
+  "version": 1,
+  "managedBy": "CDK",
+  "tags": {
+    "agentcore:created-by": "agentcore-cli",
+    "agentcore:project-name": "LapwiseF1Agent"
+  },
+  "runtimes": [
+    {
+      "name": "LapwiseF1Agent",
+      "build": "CodeZip",
+      "entrypoint": "main.py",
+      "codeLocation": "app/LapwiseF1Agent/",
+      "runtimeVersion": "PYTHON_3_14",
+      "networkMode": "PUBLIC",
+      "protocol": "HTTP",
+      "authorizerType": "CUSTOM_JWT",
+      "authorizerConfiguration": {
+        "customJwtAuthorizer": {
+          "discoveryUrl": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_Q1p1bedp6/.well-known/openid-configuration",
+          "allowedAudience": [
+            "3c0sjgi7urap4nr6e2jk39hu3b"
+          ]
+        }
+      }
+    }
+  ],
+  "memories": [
+    {
+      "name": "LapwiseMemory",
+      "eventExpiryDuration": 365,
+      "strategies": [
+        {
+          "type": "SEMANTIC",
+          "namespaceTemplates": [
+            "/users/{actorId}/facts"
+          ]
+        },
+        {
+          "type": "SUMMARIZATION",
+          "namespaceTemplates": [
+            "/summaries/{actorId}/{sessionId}"
+          ]
+        },
+        {
+          "type": "USER_PREFERENCE",
+          "namespaceTemplates": [
+            "/users/{actorId}/preferences"
+          ]
+        }
+      ]
+    }
+  ],
+  "credentials": [
+    {
+      "authorizerType": "OAuthCredentialProvider",
+      "name": "LapwiseGatewayClientB",
+      "discoveryUrl": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_Q1p1bedp6/.well-known/openid-configuration",
+      "scopes": [
+        "https://api.lapwise.io/read"
+      ],
+      "vendor": "CustomOauth2"
+    }
+  ],
+  "evaluators": [],
+  "onlineEvalConfigs": [],
+  "agentCoreGateways": [
+    {
+      "name": "LapwiseGateway",
+      "description": "Gateway for LapwiseGateway",
+      "targets": [
+        {
+          "name": "LapwiseApiTarget",
+          "targetType": "openApiSchema",
+          "outboundAuth": {
+            "type": "OAUTH",
+            "credentialName": "LapwiseGatewayClientB"
+          },
+          "schemaSource": {
+            "inline": {
+              "path": "lapwise-openapi.json"
+            }
+          }
+        }
+      ],
+      "authorizerType": "NONE",
+      "enableSemanticSearch": true,
+      "exceptionLevel": "NONE"
+    }
+  ],
+  "policyEngines": [],
+  "configBundles": [],
+  "abTests": [],
+  "httpGateways": [],
+  "harnesses": [],
+  "datasets": [],
+  "payments": []
+}

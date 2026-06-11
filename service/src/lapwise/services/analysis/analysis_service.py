@@ -87,15 +87,12 @@ class AnalysisService:
         if not sessions:
             return None, None
 
-        all_laps: list[Lap] = []
-        all_stints: list[Stint] = []
-        for session in sessions:
-            laps, stints = await asyncio.gather(
-                self._get_laps_for_session(session.session_key),
-                self._get_stints_for_session(session.session_key),
-            )
-            all_laps.extend(laps)
-            all_stints.extend(stints)
+        lap_batches, stint_batches = await asyncio.gather(
+            asyncio.gather(*[self._get_laps_for_session(s.session_key) for s in sessions]),
+            asyncio.gather(*[self._get_stints_for_session(s.session_key) for s in sessions]),
+        )
+        all_laps: list[Lap] = [lap for batch in lap_batches for lap in batch]
+        all_stints: list[Stint] = [stint for batch in stint_batches for stint in batch]
 
         driver_laps = [
             lap
@@ -243,9 +240,10 @@ class AnalysisService:
     ) -> list[FastestLapCandidate]:
         # Fetch sessions across multiple years for historical context
         years = [year, year - 1, year - 2, year - 3, year - 4]
-        sessions: list[Session] = []
-        for y in years:
-            sessions.extend(await self._get_sessions(circuit_key, y))
+        year_batches: list[list[Session]] = list(
+            await asyncio.gather(*[self._get_sessions(circuit_key, y) for y in years])
+        )
+        sessions: list[Session] = [s for batch in year_batches for s in batch]
 
         if not sessions:
             return []
@@ -253,8 +251,12 @@ class AnalysisService:
         fastest_lap_counts: dict[int, int] = defaultdict(int)
         session_count = 0
 
-        for session in sessions:
-            laps = await self._get_laps_for_session(session.session_key)
+        all_laps: list[list[Lap]] = list(
+            await asyncio.gather(
+                *[self._get_laps_for_session(s.session_key) for s in sessions]
+            )
+        )
+        for laps in all_laps:
             valid = [
                 lap for lap in laps if lap.lap_duration is not None and not lap.is_pit_out_lap
             ]
@@ -470,18 +472,19 @@ class AnalysisService:
         circuit_key: int,
         year: int,
     ) -> list[QualifyingTrend]:
-        # Fetch qualifying sessions
+        # Fetch qualifying sessions across years in parallel
         years = [year, year - 1, year - 2, year - 3, year - 4]
-        sessions: list[Session] = []
-        for y in years:
-            qual_sessions = await self._client.get(
-                "sessions",
-                Session,
-                circuit_key=circuit_key,
-                year=y,
-                session_type="Qualifying",
+        year_batches: list[list[Session]] = list(
+            await asyncio.gather(
+                *[
+                    self._client.get(
+                        "sessions", Session, circuit_key=circuit_key, year=y, session_type="Qualifying"
+                    )
+                    for y in years
+                ]
             )
-            sessions.extend(qual_sessions)
+        )
+        sessions: list[Session] = [s for batch in year_batches for s in batch]
 
         if not sessions:
             return []
@@ -490,8 +493,12 @@ class AnalysisService:
         position_count: dict[int, int] = defaultdict(int)
         q3_count: dict[int, int] = defaultdict(int)
 
-        for session in sessions:
-            grid = await self._get_starting_grid(session.session_key)
+        all_grids: list[list[StartingGridEntry]] = list(
+            await asyncio.gather(
+                *[self._get_starting_grid(s.session_key) for s in sessions]
+            )
+        )
+        for grid in all_grids:
             for entry in grid:
                 position_sum[entry.driver_number] += entry.position
                 position_count[entry.driver_number] += 1
@@ -528,11 +535,19 @@ class AnalysisService:
         if not sessions:
             return []
 
+        from lapwise.models.drivers import Driver
+
+        # Fetch drivers and pit stops for all sessions in parallel
+        driver_batches, pit_batches = await asyncio.gather(
+            asyncio.gather(
+                *[self._client.get("drivers", Driver, session_key=s.session_key) for s in sessions]
+            ),
+            asyncio.gather(*[self._get_pit_stops(s.session_key) for s in sessions]),
+        )
+
         # Map driver_number -> team_name from drivers endpoint
         driver_team: dict[int, str] = {}
-        for session in sessions:
-            from lapwise.models.drivers import Driver
-            drivers = await self._client.get("drivers", Driver, session_key=session.session_key)
+        for drivers in driver_batches:
             for d in drivers:
                 if d.team_name and d.driver_number not in driver_team:
                     driver_team[d.driver_number] = d.team_name
@@ -541,8 +556,7 @@ class AnalysisService:
         team_stops: dict[str, list[float]] = defaultdict(list)
         team_driver_sessions: dict[str, set[tuple[int, int]]] = defaultdict(set)
 
-        for session in sessions:
-            pits = await self._get_pit_stops(session.session_key)
+        for session, pits in zip(sessions, pit_batches):
             for stop in pits:
                 team = driver_team.get(stop.driver_number)
                 if team is None:

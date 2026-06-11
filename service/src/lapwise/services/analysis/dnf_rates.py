@@ -1,5 +1,6 @@
 """DNF rates analysis service."""
 
+import asyncio
 from collections import defaultdict
 
 from lapwise.clients.openf1 import OpenF1Client
@@ -44,13 +45,18 @@ class DnfRatesService:
             s.session_key: (s.session_type or "Unknown") for s in sessions
         }
 
-        # Fetch session results for every session
-        all_results: list[SessionResult] = []
-        for session in sessions:
-            results = await self._client.get(
-                "session_result", SessionResult, session_key=session.session_key
+        # Fetch session results for every session in parallel
+        result_batches: list[list[SessionResult]] = list(
+            await asyncio.gather(
+                *[
+                    self._client.get(
+                        "session_result", SessionResult, session_key=s.session_key
+                    )
+                    for s in sessions
+                ]
             )
-            all_results.extend(results)
+        )
+        all_results: list[SessionResult] = [r for batch in result_batches for r in batch]
 
         # Filter by driver if requested
         if driver_number is not None:

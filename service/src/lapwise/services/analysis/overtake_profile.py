@@ -1,5 +1,6 @@
 """Service layer for the overtake profile analysis endpoint."""
 
+import asyncio
 from datetime import datetime
 
 from lapwise.clients.openf1 import OpenF1Client
@@ -63,13 +64,16 @@ class OvertakeProfileService:
             self._client, meeting_keys, ["Race", "Sprint"]
         )
 
-        # ── Step 3: Fetch overtakes per session ──────────────────────────────
-        all_overtakes: list[Overtake] = []
-        for session in sessions:
-            overtakes = await self._client.get(
-                "overtakes", Overtake, session_key=session.session_key
+        # ── Step 3: Fetch overtakes per session in parallel ──────────────────
+        overtake_batches: list[list[Overtake]] = list(
+            await asyncio.gather(
+                *[
+                    self._client.get("overtakes", Overtake, session_key=s.session_key)
+                    for s in sessions
+                ]
             )
-            all_overtakes.extend(overtakes)
+        )
+        all_overtakes: list[Overtake] = [ot for batch in overtake_batches for ot in batch]
 
         # ── Step 4: Aggregate per driver ─────────────────────────────────────
         total_races = len(sessions)

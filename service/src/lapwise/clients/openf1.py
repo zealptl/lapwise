@@ -17,6 +17,7 @@ logger = logging.getLogger("lapwise.clients.openf1")
 _BODY_EXCERPT_LIMIT = 300
 # OpenF1 enforces 3 requests/second; stay safely under that ceiling.
 _OPENF1_RATE_LIMIT = 3.0
+_429_RETRY_DELAYS = (1.0, 2.0, 4.0)  # seconds between retries on 429
 
 
 class _RateLimiter:
@@ -61,22 +62,34 @@ class OpenF1Client:
             *translate_filters(dict(filters))
         ]
 
-        await self._rate_limiter.acquire()
+        for attempt, retry_delay in enumerate((*_429_RETRY_DELAYS, None)):
+            await self._rate_limiter.acquire()
 
-        logger.debug("GET %s params=%s", url, params)
-        t0 = time.monotonic()
-        try:
-            response = await self._client.get(url, params=params)
-        except httpx.TimeoutException as exc:
-            logger.warning("GET %s timed out", url)
-            raise UpstreamError("gateway_timeout") from exc
-        except httpx.HTTPError as exc:
-            logger.warning("GET %s HTTP error: %s", url, exc)
-            raise UpstreamError("bad_gateway") from exc
+            logger.debug("GET %s params=%s", url, params)
+            t0 = time.monotonic()
+            try:
+                response = await self._client.get(url, params=params)
+            except httpx.TimeoutException as exc:
+                logger.warning("GET %s timed out", url)
+                raise UpstreamError("gateway_timeout") from exc
+            except httpx.HTTPError as exc:
+                logger.warning("GET %s HTTP error: %s", url, exc)
+                raise UpstreamError("bad_gateway") from exc
 
-        elapsed_ms = (time.monotonic() - t0) * 1000
-        status = response.status_code
-        logger.debug("GET %s → %d (%.1fms)", url, status, elapsed_ms)
+            elapsed_ms = (time.monotonic() - t0) * 1000
+            status = response.status_code
+            logger.debug("GET %s → %d (%.1fms)", url, status, elapsed_ms)
+
+            if status == 429 and retry_delay is not None:
+                logger.warning("GET %s → 429, retrying in %.1fs (attempt %d)", url, retry_delay, attempt + 1)
+                await asyncio.sleep(retry_delay)
+                continue
+
+            break
+
+        if status == 404:
+            logger.debug("GET %s → 404 (no data for these filters)", url)
+            return []
 
         if status >= 500:
             excerpt = response.text[:_BODY_EXCERPT_LIMIT]
