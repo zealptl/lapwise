@@ -2944,7 +2944,7 @@
         ],
         "summary": "List championship driver standings",
         "description": "Retrieve Formula 1 **championship driver standings** from the OpenF1 API.\n\nEach record represents a driver's championship points and position before and after a specific race meeting.\n\n**Note:** This endpoint is marked *beta* by OpenF1 and only covers race sessions.\n\nUpstream source: <https://api.openf1.org/v1/championship_drivers>\n\n`session_key` and `meeting_key` accept an integer key or the special string `\"latest\"` to fetch the most recent available data. `driver_number` may be repeated to filter for multiple drivers at once.",
-        "operationId": "list_championship_drivers_v1_championship_drivers_get",
+        "operationId": "championship_drivers",
         "parameters": [
           {
             "name": "session_key",
@@ -3080,7 +3080,7 @@
         ],
         "summary": "List championship team standings",
         "description": "Retrieve Formula 1 **championship team (constructor) standings** from the OpenF1 API.\n\nEach record represents a constructor's championship points and position before and after a specific race meeting.\n\n**Note:** This endpoint is marked *beta* by OpenF1 and only covers race sessions.\n\nUpstream source: <https://api.openf1.org/v1/championship_teams>\n\n`session_key` and `meeting_key` accept an integer key or the special string `\"latest\"` to fetch the most recent available data.",
-        "operationId": "list_championship_teams_v1_championship_teams_get",
+        "operationId": "championship_teams",
         "parameters": [
           {
             "name": "session_key",
@@ -3213,7 +3213,7 @@
         ],
         "summary": "Championship context",
         "description": "Return championship context for drivers and constructors including momentum (POSITIVE/NEUTRAL/NEGATIVE), desperation index (0\u2013100), and constructor battle flags. Optionally filter to standings as of a specific meeting via `after_round`.",
-        "operationId": "get_championship_context_v1_analysis_championship_context_get",
+        "operationId": "championship_context",
         "parameters": [
           {
             "name": "season",
@@ -3283,7 +3283,7 @@
         ],
         "summary": "Circuit profile",
         "description": "Compute high-level circuit characteristics from historical session data: overtaking difficulty (low/medium/high), average pit stop frequency, observed tyre strategies (compounds), and a safety car probability estimate derived from rainfall-affected laps.",
-        "operationId": "get_circuit_profile_v1_analysis_circuit_profile_get",
+        "operationId": "circuit_profile",
         "parameters": [
           {
             "name": "circuit_key",
@@ -3339,7 +3339,7 @@
         ],
         "summary": "Constructor pit stop performance",
         "description": "Return per-constructor pit stop statistics including F1 Fantasy bracket scoring, fastest pitstop rate, sub-2s rate, and consistency score across recent race weekends.",
-        "operationId": "get_constructor_pitstop_v1_analysis_constructor_pitstop_get",
+        "operationId": "constructor_pitstop",
         "parameters": [
           {
             "name": "team_name",
@@ -3501,7 +3501,7 @@
         ],
         "summary": "Driver pace profile",
         "description": "Aggregate race lap times and stint lengths for a driver at a specific circuit and year. When `include_circuit_history=true`, also fetches data for the previous two years to enable historical trend analysis.",
-        "operationId": "get_driver_pace_profile_v1_analysis_driver_pace_profile_get",
+        "operationId": "driver_pace_profile",
         "parameters": [
           {
             "name": "driver_number",
@@ -3580,7 +3580,7 @@
         ],
         "summary": "Fastest lap candidates",
         "description": "Rank drivers by how often they have recorded the fastest lap at a circuit across up to five historical seasons. Results are ordered by fastest-lap count descending.",
-        "operationId": "get_fastest_lap_candidates_v1_analysis_fastest_lap_candidates_get",
+        "operationId": "fastest_lap_candidates",
         "parameters": [
           {
             "name": "circuit_key",
@@ -3640,7 +3640,7 @@
         ],
         "summary": "Driver overtake profiles",
         "description": "Compute per-driver offensive and defensive overtake statistics from Race and Sprint sessions.\n\n**aggression_score** \u2014 percentile rank (0\u2013100) of the driver's `overtake_rate` vs all other drivers in the same sample; 100 = most overtakes made per session. A score above 70 indicates an assertive overtaker; below 30 indicates a driver who rarely makes positions.\n\n**circuit_overtake_avg** \u2014 the driver's average overtakes per session specifically at the queried circuit. Only populated when `session_key` is provided or `include_circuit_history=true`; otherwise `null`.\n\n**total_races** is the denominator for `overtake_rate` and `defensive_rate`. Sprint weekends contribute 2 sessions (Sprint + Race) so `total_races` may exceed `sample_races`.\n\nOmitting `driver_number` returns statistics for every driver active in the sample window.",
-        "operationId": "overtake_profile_v1_analysis_overtake_profile_get",
+        "operationId": "overtake_profile",
         "parameters": [
           {
             "name": "driver_number",
@@ -3784,7 +3784,7 @@
         ],
         "summary": "Qualifying trends",
         "description": "Return per-driver average qualifying position and Q3 appearance frequency at a circuit across up to five historical seasons. Results are sorted by average qualifying position ascending (better qualifiers first).",
-        "operationId": "get_qualifying_trends_v1_analysis_qualifying_trends_get",
+        "operationId": "qualifying_trends",
         "parameters": [
           {
             "name": "circuit_key",
