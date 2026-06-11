@@ -84,6 +84,7 @@ _RESPONSES: dict[int | str, dict[str, object]] = {
 
 @router.get(
     "/circuit-profile",
+    operation_id="circuit_profile",
     response_model=CircuitProfile,
     summary="Circuit profile",
     description=_DESCRIPTION,

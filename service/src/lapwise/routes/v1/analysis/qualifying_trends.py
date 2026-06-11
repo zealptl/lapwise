@@ -86,6 +86,7 @@ _RESPONSES: dict[int | str, dict[str, object]] = {
 
 @router.get(
     "/qualifying-trends",
+    operation_id="qualifying_trends",
     response_model=QualifyingTrends,
     summary="Qualifying trends for a driver",
     description=_DESCRIPTION,

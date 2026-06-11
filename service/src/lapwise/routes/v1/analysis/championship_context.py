@@ -112,6 +112,7 @@ _RESPONSES: dict[int | str, dict[str, object]] = {
 
 @router.get(
     "/championship-context",
+    operation_id="championship_context",
     response_model=ChampionshipContext,
     summary="Championship context snapshot",
     description=_DESCRIPTION,

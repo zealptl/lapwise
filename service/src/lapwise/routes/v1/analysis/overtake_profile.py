@@ -90,6 +90,7 @@ _RESPONSES: dict[int | str, dict[str, object]] = {
 
 @router.get(
     "/overtake-profile",
+    operation_id="overtake_profile",
     response_model=list[OvertakeProfile],
     summary="Driver overtake profiles",
     description=_DESCRIPTION,

@@ -72,6 +72,7 @@ _RESPONSES: dict[int | str, dict[str, object]] = {
 
 @router.get(
     "/championship_drivers",
+    operation_id="championship_drivers",
     response_model=list[ChampionshipDriver],
     summary="List championship driver standings",
     description=_DESCRIPTION,

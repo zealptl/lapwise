@@ -86,6 +86,7 @@ _RESPONSES: dict[int | str, dict[str, object]] = {
 
 @router.get(
     "/driver-pace-profile",
+    operation_id="driver_pace_profile",
     response_model=DriverPaceProfile,
     summary="Driver pace profile",
     description=_DESCRIPTION,

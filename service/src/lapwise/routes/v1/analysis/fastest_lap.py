@@ -86,6 +86,7 @@ _RESPONSES: dict[int | str, dict[str, object]] = {
 
 @router.get(
     "/fastest-lap-candidates",
+    operation_id="fastest_lap_candidates",
     response_model=list[FastestLapCandidate],
     summary="Fastest lap candidates",
     description=_DESCRIPTION,
