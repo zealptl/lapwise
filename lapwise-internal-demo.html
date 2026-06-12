@@ -174,8 +174,11 @@ img, video, canvas, svg {
 .reveal, .reveal-left, .reveal-grow { transition-delay: var(--d, 0s); }
 
 /* draw-in for SVG connector lines on diagram slides */
-.slide .wire { stroke-dasharray: 800; stroke-dashoffset: 800; transition: stroke-dashoffset 1s var(--ease-out-expo); transition-delay: var(--d, 0.5s); }
+.slide .wire { stroke-dasharray: 2000; stroke-dashoffset: 2000; transition: stroke-dashoffset 1s var(--ease-out-expo); transition-delay: var(--d, 0.5s); }
 .slide.visible .wire { stroke-dashoffset: 0; }
+/* dashed response arrows: fade in instead of draw (the draw animation would override the dash pattern) */
+.slide .wire-dash { stroke-dasharray: 8 7; opacity: 0; transition: opacity 0.5s var(--ease-out-expo); transition-delay: var(--d, 0.5s); }
+.slide.visible .wire-dash { opacity: 1; }
 
 /* ===========================================
    COMPONENT STYLES
@@ -346,10 +349,109 @@ body.editing [data-edit] { outline: 1px dashed rgba(255,51,0,0.65); outline-offs
 </section>
 
 <!-- ============================================================
-     SLIDE 04 — FULL ARCHITECTURE DIAGRAM
+     SLIDE 04 — API SURFACE
+     ============================================================ -->
+<section class="slide" data-section="API">
+    <div class="gline-h" style="top:560px"></div>
+    <div class="kicker reveal"><span class="n">04</span><span data-edit>The API surface</span></div>
+
+    <h2 class="h-big reveal" style="--d:0.1s" data-edit>The <em>engine</em></h2>
+    <div class="h-rule reveal-grow" style="--d:0.3s; top:250px; width:300px;"></div>
+
+    <div class="reveal" style="--d:0.15s; position:absolute; right:120px; top:120px; text-align:right;">
+        <div class="stat-n">23<span style="color:var(--red)">.</span></div>
+        <div style="font-family:var(--font-display); font-weight:800; font-size:30px; text-transform:uppercase; letter-spacing:0.08em; margin-top:8px;" data-edit>Endpoints, all under /v1</div>
+    </div>
+
+    <div class="reveal" style="--d:0.3s; position:absolute; left:120px; top:330px; width:1300px; font-size:27px; color:var(--ink-soft); line-height:1.55;" data-edit>
+        Three tiers: raw OpenF1 passthrough with validation, opinionated analysis aggregations, and fantasy pricing — every route documented with OpenAPI examples.
+    </div>
+
+    <div style="position:absolute; left:120px; top:620px; right:120px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:48px;">
+        <div class="reveal" style="--d:0.4s">
+            <div style="font-family:var(--font-display); font-weight:900; font-size:34px; text-transform:uppercase; border-bottom:5px solid var(--ink); padding-bottom:14px; margin-bottom:24px;" data-edit>Race data</div>
+            <div><span class="chip">laps</span><span class="chip">stints</span><span class="chip">pit</span><span class="chip">position</span><span class="chip">overtakes</span><span class="chip">weather</span><span class="chip">sessions</span><span class="chip">drivers</span><span class="chip">grid</span><span class="chip">results</span></div>
+        </div>
+        <div class="reveal" style="--d:0.55s">
+            <div style="font-family:var(--font-display); font-weight:900; font-size:34px; text-transform:uppercase; border-bottom:5px solid var(--red); padding-bottom:14px; margin-bottom:24px;" data-edit>Analysis</div>
+            <div><span class="chip">driver-pace</span><span class="chip">fastest-lap</span><span class="chip">dnf-rates</span><span class="chip">quali-trends</span><span class="chip">circuit-profile</span><span class="chip">pitstop</span><span class="chip">overtake-profile</span><span class="chip">championship</span></div>
+        </div>
+        <div class="reveal" style="--d:0.7s">
+            <div style="font-family:var(--font-display); font-weight:900; font-size:34px; text-transform:uppercase; border-bottom:5px solid var(--ink); padding-bottom:14px; margin-bottom:24px;" data-edit>Fantasy</div>
+            <div><span class="chip hot">prices</span><span class="chip">champ-drivers</span><span class="chip">champ-teams</span></div>
+            <div style="font-size:21px; color:var(--ink-soft); margin-top:16px; line-height:1.5;" data-edit>The agent's raw material for team-building under the £100M cap.</div>
+        </div>
+    </div>
+
+    <div class="foot"><div data-edit>API</div><div class="pg">04 /13</div></div>
+</section>
+
+<!-- ============================================================
+     SLIDE 05 — ANALYSIS DEEP-DIVE (driver-pace + constructor-pitstop)
+     ============================================================ -->
+<section class="slide" data-section="API">
+    <div class="gline-v" style="left:960px"></div>
+    <div class="kicker reveal"><span class="n">05</span><span data-edit>Analysis deep-dive — the two hardest endpoints</span></div>
+    <h2 class="h-big reveal" style="--d:0.1s" data-edit>The hard <em>math</em></h2>
+    <div class="h-rule reveal-grow" style="--d:0.3s; top:250px; width:300px;"></div>
+
+    <!-- ── LEFT: driver pace ── -->
+    <div style="position:absolute; left:120px; top:300px; width:760px;">
+        <div class="reveal" style="--d:0.25s"><span class="chip hot" style="font-size:20px">GET /v1/analysis/driver-pace</span></div>
+        <p class="reveal" style="--d:0.3s; font-size:21px; color:var(--ink-soft); line-height:1.45; margin-top:14px;" data-edit>
+            One driver → a full pace profile over the last 12 race weekends. Fetches <b>sessions, starting grids, laps, stints and results</b> from OpenF1 — concurrently with asyncio — then computes:
+        </p>
+
+        <div class="reveal" style="--d:0.4s; margin-top:22px; border:3px solid var(--ink); padding:18px 22px;">
+            <div style="font-family:var(--font-display); font-weight:800; font-size:22px; text-transform:uppercase;" data-edit>Qpace <span style="color:var(--red)">· qualifying</span></div>
+            <div style="font-size:19px; color:var(--ink-soft); line-height:1.4; margin-top:6px;" data-edit>Each grid slot scores <span style="font-family:var(--font-mono);font-size:16px">21 − position</span>, recency-weighted with 0.85 decay, scaled to 0–100. Newer vs older half ±10% ⇒ IMPROVING / DECLINING trend. Sector deltas vs field best name the strongest sector.</div>
+        </div>
+
+        <div class="reveal" style="--d:0.5s; margin-top:18px; border:3px solid var(--red); padding:18px 22px;">
+            <div style="font-family:var(--font-display); font-weight:800; font-size:22px; text-transform:uppercase; color:var(--red);" data-edit>Rpace · race — the clean-lap funnel</div>
+            <!-- funnel viz: which laps survive into the pace number -->
+            <div style="margin-top:14px;">
+                <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><div style="height:26px; width:560px; background:#0a0a0a;"></div><span style="font-family:var(--font-mono); font-size:15px;" data-edit>every race lap</span></div>
+                <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><div style="height:26px; width:430px; background:#0a0a0a; opacity:0.75;"></div><span style="font-family:var(--font-mono); font-size:15px;" data-edit>− lap 1 &amp; pit-out laps</span></div>
+                <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><div style="height:26px; width:320px; background:#0a0a0a; opacity:0.55;"></div><span style="font-family:var(--font-mono); font-size:15px;" data-edit>− safety-car laps (&gt; threshold × median)</span></div>
+                <div style="display:flex; align-items:center; gap:14px;"><div style="height:26px; width:210px; background:var(--red);"></div><span style="font-family:var(--font-mono); font-size:15px;" data-edit>tyre age 3–15 only → clean laps</span></div>
+            </div>
+            <div style="font-size:19px; color:var(--ink-soft); line-height:1.4; margin-top:14px;" data-edit>Each clean lap is divided by the <b>session median</b> so wet Spa and dry Monza compare fairly. Rpace = median ratio; the same maths runs for every driver to place them on a <b>percentile vs the field</b>. Plus: avg positions gained when starting P10+.</div>
+        </div>
+    </div>
+
+    <!-- ── RIGHT: constructor pitstop ── -->
+    <div style="position:absolute; left:1040px; top:300px; width:760px;">
+        <div class="reveal" style="--d:0.45s"><span class="chip hot" style="font-size:20px">GET /v1/analysis/constructor-pitstop</span></div>
+        <p class="reveal" style="--d:0.5s; font-size:21px; color:var(--ink-soft); line-height:1.45; margin-top:14px;" data-edit>
+            The constructor signal: pit crew speed → fantasy points. Fetches <b>pit stops + driver rosters</b> for every Race and Sprint, maps each stop to its team, drops outliers &gt; 60s, then scores every stop on the F1 Fantasy brackets:
+        </p>
+
+        <!-- bracket bar chart: stop duration → points -->
+        <div class="reveal" style="--d:0.6s; margin-top:22px; border:3px solid var(--ink); padding:22px 26px 16px;">
+            <div style="display:flex; align-items:flex-end; gap:26px; height:230px;">
+                <div style="flex:1; text-align:center;"><div style="font-family:var(--font-display); font-weight:900; font-size:24px;">20</div><div style="height:170px; background:var(--red); margin-top:6px;"></div><div style="font-family:var(--font-mono); font-size:15px; margin-top:8px;">&lt; 2.0s</div></div>
+                <div style="flex:1; text-align:center;"><div style="font-family:var(--font-display); font-weight:900; font-size:24px;">10</div><div style="height:85px; background:#0a0a0a; margin-top:6px;"></div><div style="font-family:var(--font-mono); font-size:15px; margin-top:8px;">&lt; 2.2s</div></div>
+                <div style="flex:1; text-align:center;"><div style="font-family:var(--font-display); font-weight:900; font-size:24px;">5</div><div style="height:43px; background:#0a0a0a; margin-top:6px;"></div><div style="font-family:var(--font-mono); font-size:15px; margin-top:8px;">&lt; 2.5s</div></div>
+                <div style="flex:1; text-align:center;"><div style="font-family:var(--font-display); font-weight:900; font-size:24px;">2</div><div style="height:17px; background:#0a0a0a; margin-top:6px;"></div><div style="font-family:var(--font-mono); font-size:15px; margin-top:8px;">≤ 3.0s</div></div>
+                <div style="flex:1; text-align:center;"><div style="font-family:var(--font-display); font-weight:900; font-size:24px; color:var(--ink-faint);">0</div><div style="height:4px; background:#888; margin-top:6px;"></div><div style="font-family:var(--font-mono); font-size:15px; margin-top:8px;">&gt; 3.0s</div></div>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:15px; color:var(--ink-soft); margin-top:14px; text-align:center;" data-edit>points per stop · +5 bonus for the fastest stop of the race</div>
+        </div>
+
+        <div class="reveal" style="--d:0.72s; margin-top:18px; font-size:20px; color:var(--ink-soft); line-height:1.5; border-left:6px solid var(--red); padding-left:22px;" data-edit>
+            Per constructor it then reports <b>fantasy points / race</b>, fastest-stop rate, sub-2s rate, and a <b>consistency score</b> — <span style="font-family:var(--font-mono);font-size:16px">100 − stdev × 100</span> — because for a constructor pick, a crew that's always 2.3s beats one that swings 1.9–3.5s.
+        </div>
+    </div>
+
+    <div class="foot"><div data-edit>API</div><div class="pg">05 /13</div></div>
+</section>
+
+<!-- ============================================================
+     SLIDE 06 — FULL ARCHITECTURE DIAGRAM
      ============================================================ -->
 <section class="slide" data-section="Architecture">
-    <div class="kicker reveal"><span class="n">04</span><span data-edit>Architecture — the whole circuit</span></div>
+    <div class="kicker reveal"><span class="n">06</span><span data-edit>Architecture — the whole circuit</span></div>
 
     <!-- legend -->
     <div class="reveal" style="--d:0.2s; position:absolute; top:64px; right:120px; font-size:16px; color:var(--ink-soft); display:flex; gap:28px; align-items:center;">
@@ -447,14 +549,14 @@ body.editing [data-edit] { outline: 1px dashed rgba(255,51,0,0.65); outline-offs
     <div class="wirelabel reveal" style="--d:1.1s; left:790px; top:685px;">M2M&nbsp;A</div>
     <div class="wirelabel reveal" style="--d:1.2s; left:870px; top:530px;">M2M client B token</div>
 
-    <div class="foot"><div data-edit>Architecture</div><div class="pg">04 /13</div></div>
+    <div class="foot"><div data-edit>Architecture</div><div class="pg">06 /13</div></div>
 </section>
 
 <!-- ============================================================
-     SLIDE 05 — AGENT SEQUENCE DIAGRAM (JWT in, two M2M hops, tool call)
+     SLIDE 07 — AGENT SEQUENCE DIAGRAM (JWT in, two M2M hops, tool call)
      ============================================================ -->
 <section class="slide" data-section="Agent">
-    <div class="kicker reveal"><span class="n">05</span><span data-edit>One agent turn — JWT in, two M2M hops, tools out</span></div>
+    <div class="kicker reveal"><span class="n">07</span><span data-edit>One agent turn — JWT in, two M2M hops, tools out</span></div>
 
     <!-- legend -->
     <div class="reveal" style="--d:0.2s; position:absolute; top:64px; right:120px; font-size:16px; color:var(--ink-soft); display:flex; gap:28px; align-items:center;">
@@ -485,22 +587,22 @@ body.editing [data-edit] { outline: 1px dashed rgba(255,51,0,0.65); outline-offs
         <path class="wire" style="--d:0.35s" d="M174 340 L468 340" stroke="#0a0a0a" stroke-width="3" marker-end="url(#seqarr)"/>
         <!-- 2 M2M client A exchange -->
         <path class="wire" style="--d:0.5s" d="M484 410 L778 410" stroke="#ff3300" stroke-width="3" marker-end="url(#seqarr-red)"/>
-        <path class="wire" style="--d:0.6s" d="M786 452 L492 452" stroke="#ff3300" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#seqarr-red)"/>
+        <path class="wire-dash" style="--d:0.6s" d="M786 452 L492 452" stroke="#ff3300" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#seqarr-red)"/>
         <!-- 3 MCP connect, tool catalog back -->
         <path class="wire" style="--d:0.72s" d="M484 522 L1088 522" stroke="#0a0a0a" stroke-width="3" marker-end="url(#seqarr)"/>
-        <path class="wire" style="--d:0.82s" d="M1096 564 L492 564" stroke="#0a0a0a" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#seqarr)"/>
+        <path class="wire-dash" style="--d:0.82s" d="M1096 564 L492 564" stroke="#0a0a0a" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#seqarr)"/>
         <!-- 4 reasoning on Bedrock -->
         <path class="wire" style="--d:0.94s" d="M484 632 L1708 632" stroke="#0a0a0a" stroke-width="3" marker-end="url(#seqarr)"/>
         <!-- 5 tool call to gateway -->
         <path class="wire" style="--d:1.06s" d="M484 700 L1088 700" stroke="#0a0a0a" stroke-width="3" marker-end="url(#seqarr)"/>
         <!-- 6 M2M client B exchange (gateway → cognito) -->
         <path class="wire" style="--d:1.18s" d="M1096 768 L802 768" stroke="#ff3300" stroke-width="3" marker-end="url(#seqarr-red)"/>
-        <path class="wire" style="--d:1.28s" d="M794 810 L1088 810" stroke="#ff3300" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#seqarr-red)"/>
+        <path class="wire-dash" style="--d:1.28s" d="M794 810 L1088 810" stroke="#ff3300" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#seqarr-red)"/>
         <!-- 7 the actual tool call -->
         <path class="wire" style="--d:1.4s" d="M1104 878 L1398 878" stroke="#0a0a0a" stroke-width="3" marker-end="url(#seqarr)"/>
-        <path class="wire" style="--d:1.5s" d="M1406 920 L1112 920" stroke="#0a0a0a" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#seqarr)"/>
+        <path class="wire-dash" style="--d:1.5s" d="M1406 920 L1112 920" stroke="#0a0a0a" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#seqarr)"/>
         <!-- 8 answer back to user -->
-        <path class="wire" style="--d:1.62s" d="M476 975 L182 975" stroke="#0a0a0a" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#seqarr)"/>
+        <path class="wire-dash" style="--d:1.62s" d="M476 975 L182 975" stroke="#0a0a0a" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#seqarr)"/>
     </svg>
 
     <!-- ── actor boxes ── -->
@@ -557,106 +659,7 @@ body.editing [data-edit] { outline: 1px dashed rgba(255,51,0,0.65); outline-offs
         Two separate M2M clients: <b>A</b> gets the agent into its gateway, <b>B</b> gets the gateway into the API. Each hop rotates independently — and the JWT authorizer accepts both audiences.
     </div>
 
-    <div class="foot"><div data-edit>Agent</div><div class="pg">05 /13</div></div>
-</section>
-
-<!-- ============================================================
-     SLIDE 06 — API SURFACE
-     ============================================================ -->
-<section class="slide" data-section="API">
-    <div class="gline-h" style="top:560px"></div>
-    <div class="kicker reveal"><span class="n">06</span><span data-edit>The API surface</span></div>
-
-    <h2 class="h-big reveal" style="--d:0.1s" data-edit>The <em>engine</em></h2>
-    <div class="h-rule reveal-grow" style="--d:0.3s; top:250px; width:300px;"></div>
-
-    <div class="reveal" style="--d:0.15s; position:absolute; right:120px; top:120px; text-align:right;">
-        <div class="stat-n">23<span style="color:var(--red)">.</span></div>
-        <div style="font-family:var(--font-display); font-weight:800; font-size:30px; text-transform:uppercase; letter-spacing:0.08em; margin-top:8px;" data-edit>Endpoints, all under /v1</div>
-    </div>
-
-    <div class="reveal" style="--d:0.3s; position:absolute; left:120px; top:330px; width:1300px; font-size:27px; color:var(--ink-soft); line-height:1.55;" data-edit>
-        Three tiers: raw OpenF1 passthrough with validation, opinionated analysis aggregations, and fantasy pricing — every route documented with OpenAPI examples.
-    </div>
-
-    <div style="position:absolute; left:120px; top:620px; right:120px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:48px;">
-        <div class="reveal" style="--d:0.4s">
-            <div style="font-family:var(--font-display); font-weight:900; font-size:34px; text-transform:uppercase; border-bottom:5px solid var(--ink); padding-bottom:14px; margin-bottom:24px;" data-edit>Race data</div>
-            <div><span class="chip">laps</span><span class="chip">stints</span><span class="chip">pit</span><span class="chip">position</span><span class="chip">overtakes</span><span class="chip">weather</span><span class="chip">sessions</span><span class="chip">drivers</span><span class="chip">grid</span><span class="chip">results</span></div>
-        </div>
-        <div class="reveal" style="--d:0.55s">
-            <div style="font-family:var(--font-display); font-weight:900; font-size:34px; text-transform:uppercase; border-bottom:5px solid var(--red); padding-bottom:14px; margin-bottom:24px;" data-edit>Analysis</div>
-            <div><span class="chip">driver-pace</span><span class="chip">fastest-lap</span><span class="chip">dnf-rates</span><span class="chip">quali-trends</span><span class="chip">circuit-profile</span><span class="chip">pitstop</span><span class="chip">overtake-profile</span><span class="chip">championship</span></div>
-        </div>
-        <div class="reveal" style="--d:0.7s">
-            <div style="font-family:var(--font-display); font-weight:900; font-size:34px; text-transform:uppercase; border-bottom:5px solid var(--ink); padding-bottom:14px; margin-bottom:24px;" data-edit>Fantasy</div>
-            <div><span class="chip hot">prices</span><span class="chip">champ-drivers</span><span class="chip">champ-teams</span></div>
-            <div style="font-size:21px; color:var(--ink-soft); margin-top:16px; line-height:1.5;" data-edit>The agent's raw material for team-building under the £100M cap.</div>
-        </div>
-    </div>
-
-    <div class="foot"><div data-edit>API</div><div class="pg">06 /13</div></div>
-</section>
-
-<!-- ============================================================
-     SLIDE 07 — ANALYSIS DEEP-DIVE (driver-pace + constructor-pitstop)
-     ============================================================ -->
-<section class="slide" data-section="API">
-    <div class="gline-v" style="left:960px"></div>
-    <div class="kicker reveal"><span class="n">07</span><span data-edit>Analysis deep-dive — the two hardest endpoints</span></div>
-    <h2 class="h-big reveal" style="--d:0.1s" data-edit>The hard <em>math</em></h2>
-    <div class="h-rule reveal-grow" style="--d:0.3s; top:250px; width:300px;"></div>
-
-    <!-- ── LEFT: driver pace ── -->
-    <div style="position:absolute; left:120px; top:300px; width:760px;">
-        <div class="reveal" style="--d:0.25s"><span class="chip hot" style="font-size:20px">GET /v1/analysis/driver-pace</span></div>
-        <p class="reveal" style="--d:0.3s; font-size:21px; color:var(--ink-soft); line-height:1.45; margin-top:14px;" data-edit>
-            One driver → a full pace profile over the last 12 race weekends. Fetches <b>sessions, starting grids, laps, stints and results</b> from OpenF1 — concurrently with asyncio — then computes:
-        </p>
-
-        <div class="reveal" style="--d:0.4s; margin-top:22px; border:3px solid var(--ink); padding:18px 22px;">
-            <div style="font-family:var(--font-display); font-weight:800; font-size:22px; text-transform:uppercase;" data-edit>Qpace <span style="color:var(--red)">· qualifying</span></div>
-            <div style="font-size:19px; color:var(--ink-soft); line-height:1.4; margin-top:6px;" data-edit>Each grid slot scores <span style="font-family:var(--font-mono);font-size:16px">21 − position</span>, recency-weighted with 0.85 decay, scaled to 0–100. Newer vs older half ±10% ⇒ IMPROVING / DECLINING trend. Sector deltas vs field best name the strongest sector.</div>
-        </div>
-
-        <div class="reveal" style="--d:0.5s; margin-top:18px; border:3px solid var(--red); padding:18px 22px;">
-            <div style="font-family:var(--font-display); font-weight:800; font-size:22px; text-transform:uppercase; color:var(--red);" data-edit>Rpace · race — the clean-lap funnel</div>
-            <!-- funnel viz: which laps survive into the pace number -->
-            <div style="margin-top:14px;">
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><div style="height:26px; width:560px; background:#0a0a0a;"></div><span style="font-family:var(--font-mono); font-size:15px;" data-edit>every race lap</span></div>
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><div style="height:26px; width:430px; background:#0a0a0a; opacity:0.75;"></div><span style="font-family:var(--font-mono); font-size:15px;" data-edit>− lap 1 &amp; pit-out laps</span></div>
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><div style="height:26px; width:320px; background:#0a0a0a; opacity:0.55;"></div><span style="font-family:var(--font-mono); font-size:15px;" data-edit>− safety-car laps (&gt; threshold × median)</span></div>
-                <div style="display:flex; align-items:center; gap:14px;"><div style="height:26px; width:210px; background:var(--red);"></div><span style="font-family:var(--font-mono); font-size:15px;" data-edit>tyre age 3–15 only → clean laps</span></div>
-            </div>
-            <div style="font-size:19px; color:var(--ink-soft); line-height:1.4; margin-top:14px;" data-edit>Each clean lap is divided by the <b>session median</b> so wet Spa and dry Monza compare fairly. Rpace = median ratio; the same maths runs for every driver to place them on a <b>percentile vs the field</b>. Plus: avg positions gained when starting P10+.</div>
-        </div>
-    </div>
-
-    <!-- ── RIGHT: constructor pitstop ── -->
-    <div style="position:absolute; left:1040px; top:300px; width:760px;">
-        <div class="reveal" style="--d:0.45s"><span class="chip hot" style="font-size:20px">GET /v1/analysis/constructor-pitstop</span></div>
-        <p class="reveal" style="--d:0.5s; font-size:21px; color:var(--ink-soft); line-height:1.45; margin-top:14px;" data-edit>
-            The constructor signal: pit crew speed → fantasy points. Fetches <b>pit stops + driver rosters</b> for every Race and Sprint, maps each stop to its team, drops outliers &gt; 60s, then scores every stop on the F1 Fantasy brackets:
-        </p>
-
-        <!-- bracket bar chart: stop duration → points -->
-        <div class="reveal" style="--d:0.6s; margin-top:22px; border:3px solid var(--ink); padding:22px 26px 16px;">
-            <div style="display:flex; align-items:flex-end; gap:26px; height:230px;">
-                <div style="flex:1; text-align:center;"><div style="font-family:var(--font-display); font-weight:900; font-size:24px;">20</div><div style="height:170px; background:var(--red); margin-top:6px;"></div><div style="font-family:var(--font-mono); font-size:15px; margin-top:8px;">&lt; 2.0s</div></div>
-                <div style="flex:1; text-align:center;"><div style="font-family:var(--font-display); font-weight:900; font-size:24px;">10</div><div style="height:85px; background:#0a0a0a; margin-top:6px;"></div><div style="font-family:var(--font-mono); font-size:15px; margin-top:8px;">&lt; 2.2s</div></div>
-                <div style="flex:1; text-align:center;"><div style="font-family:var(--font-display); font-weight:900; font-size:24px;">5</div><div style="height:43px; background:#0a0a0a; margin-top:6px;"></div><div style="font-family:var(--font-mono); font-size:15px; margin-top:8px;">&lt; 2.5s</div></div>
-                <div style="flex:1; text-align:center;"><div style="font-family:var(--font-display); font-weight:900; font-size:24px;">2</div><div style="height:17px; background:#0a0a0a; margin-top:6px;"></div><div style="font-family:var(--font-mono); font-size:15px; margin-top:8px;">≤ 3.0s</div></div>
-                <div style="flex:1; text-align:center;"><div style="font-family:var(--font-display); font-weight:900; font-size:24px; color:var(--ink-faint);">0</div><div style="height:4px; background:#888; margin-top:6px;"></div><div style="font-family:var(--font-mono); font-size:15px; margin-top:8px;">&gt; 3.0s</div></div>
-            </div>
-            <div style="font-family:var(--font-mono); font-size:15px; color:var(--ink-soft); margin-top:14px; text-align:center;" data-edit>points per stop · +5 bonus for the fastest stop of the race</div>
-        </div>
-
-        <div class="reveal" style="--d:0.72s; margin-top:18px; font-size:20px; color:var(--ink-soft); line-height:1.5; border-left:6px solid var(--red); padding-left:22px;" data-edit>
-            Per constructor it then reports <b>fantasy points / race</b>, fastest-stop rate, sub-2s rate, and a <b>consistency score</b> — <span style="font-family:var(--font-mono);font-size:16px">100 − stdev × 100</span> — because for a constructor pick, a crew that's always 2.3s beats one that swings 1.9–3.5s.
-        </div>
-    </div>
-
-    <div class="foot"><div data-edit>API</div><div class="pg">07 /13</div></div>
+    <div class="foot"><div data-edit>Agent</div><div class="pg">07 /13</div></div>
 </section>
 
 <!-- ============================================================
