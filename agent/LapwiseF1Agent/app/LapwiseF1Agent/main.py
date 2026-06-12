@@ -13,6 +13,7 @@ from google.adk.tools import preload_memory
 from cognito import CognitoTokenCache
 from memory import AgentCoreMemoryService
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 MEMORY_ID = os.getenv("MEMORY_ID")
@@ -67,11 +68,13 @@ def _load_gateway_toolset():
             "AGENTCORE_GATEWAY_LAPWISEGATEWAY_URL not set — skipping gateway tools (dev mode)"
         )
         return []
+    logger.info("Loading MCPToolset from gateway: %s", GATEWAY_URL)
     try:
         from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset
         from google.adk.tools.mcp_tool.mcp_session_manager import StreamableHTTPConnectionParams
 
         token = _token_cache.get_token()
+        logger.info("Gateway token acquired: %s", "yes" if token else "NO TOKEN — connecting without auth")
         headers = {"Authorization": f"Bearer {token}"} if token else {}
         toolset = MCPToolset(
             connection_params=StreamableHTTPConnectionParams(
@@ -79,7 +82,7 @@ def _load_gateway_toolset():
                 headers=headers,
             )
         )
-        logger.info("Loaded MCPToolset from AgentCore Gateway: %s", GATEWAY_URL)
+        logger.info("MCPToolset created successfully for gateway: %s", GATEWAY_URL)
         return [toolset]
     except Exception:
         logger.warning("Failed to load gateway toolset", exc_info=True)
@@ -100,7 +103,12 @@ def save_user_preference(preference: str) -> str:
 
 async def persist_session_callback(callback_context) -> None:
     """Session-end callback: persist turns to AgentCore Memory for SUMMARY + USER_PREFERENCE extraction."""
-    await callback_context.add_session_to_memory()
+    logger.info("persist_session_callback fired — persisting session to memory")
+    try:
+        await callback_context.add_session_to_memory()
+        logger.info("persist_session_callback: memory persist succeeded")
+    except Exception:
+        logger.warning("persist_session_callback: memory persist failed", exc_info=True)
 
 
 # ---------------------------------------------------------------------------
@@ -119,6 +127,7 @@ _gateway_toolset: list = []
 _model = "bedrock/us.anthropic.claude-sonnet-4-6"
 
 _root_agent: Agent | None = None
+_session_service = InMemorySessionService()
 
 
 def _ensure_gateway_toolset() -> None:
@@ -126,17 +135,26 @@ def _ensure_gateway_toolset() -> None:
     if not _gateway_toolset_loaded:
         _gateway_toolset = _load_gateway_toolset()
         _gateway_toolset_loaded = True
+        logger.info("Gateway toolset loaded: %d toolset(s)", len(_gateway_toolset))
+    else:
+        logger.debug("Gateway toolset already loaded (cached)")
 
 
 def _get_root_agent() -> Agent:
     global _root_agent
     if _root_agent is None:
         _ensure_gateway_toolset()
+        tools = [preload_memory, save_user_preference] + _gateway_toolset
+        logger.info(
+            "Creating root agent with %d top-level tool(s): %s",
+            len(tools),
+            [getattr(t, "name", type(t).__name__) for t in tools],
+        )
         agent = Agent(
             name="LapwiseF1Agent",
             model=_model,
             instruction=SYSTEM_PROMPT,
-            tools=[preload_memory, save_user_preference] + _gateway_toolset,
+            tools=tools,
         )
         agent.after_agent_callback = persist_session_callback
         _root_agent = agent
@@ -147,8 +165,8 @@ async def handle_session(
     user_message: str,
     session_id: str | None = None,
     user_id: str = "anonymous",
-) -> str:
-    """Run one user turn and return the agent's final response text."""
+) -> tuple[str, str]:
+    """Run one user turn and return (response_text, session_id)."""
 
     sid = session_id or str(uuid.uuid4())
 
@@ -162,44 +180,87 @@ async def handle_session(
     except Exception:
         _use_xray = False
 
-    logger.info(json.dumps({"event": "session_start", "session_id": sid, "user_id": user_id}))
+    logger.info(
+        json.dumps({
+            "event": "session_start",
+            "session_id": sid,
+            "user_id": user_id,
+            "message_length": len(user_message),
+            "message_preview": user_message[:120],
+        })
+    )
 
     try:
-        session_service = InMemorySessionService()
         runner = Runner(
             app_name="LapwiseF1Agent",
             agent=_get_root_agent(),
-            session_service=session_service,
+            session_service=_session_service,
             memory_service=_memory_service,
         )
-        await session_service.create_session(
+        existing = await _session_service.get_session(
             app_name="LapwiseF1Agent", user_id=user_id, session_id=sid
         )
+        if not existing:
+            await _session_service.create_session(
+                app_name="LapwiseF1Agent", user_id=user_id, session_id=sid
+            )
+            logger.info("Created new session: %s", sid)
+        else:
+            logger.info("Resumed existing session: %s", sid)
 
         from google.genai.types import Content, Part  # type: ignore[import]
 
         user_content = Content(role="user", parts=[Part(text=user_message)])
         result_text = ""
+        event_count = 0
 
         async for event in runner.run_async(
             user_id=user_id, session_id=sid, new_message=user_content
         ):
+            event_count += 1
+            author = getattr(event, "author", "?")
+            has_text = False
+            has_tool_call = False
+            has_tool_result = False
             if getattr(event, "content", None):
                 for part in event.content.parts or []:
                     if getattr(part, "text", None):
                         result_text += part.text
+                        has_text = True
+                    if getattr(part, "function_call", None):
+                        fc = part.function_call
+                        logger.info(
+                            "Tool call: author=%s name=%s args_keys=%s",
+                            author,
+                            getattr(fc, "name", "?"),
+                            list((getattr(fc, "args", None) or {}).keys()),
+                        )
+                        has_tool_call = True
+                    if getattr(part, "function_response", None):
+                        fr = part.function_response
+                        resp_preview = str(getattr(fr, "response", ""))[:200]
+                        logger.info(
+                            "Tool response: name=%s response_preview=%s",
+                            getattr(fr, "name", "?"),
+                            resp_preview,
+                        )
+                        has_tool_result = True
+            logger.debug(
+                "ADK event #%d: author=%s text=%s tool_call=%s tool_result=%s",
+                event_count, author, has_text, has_tool_call, has_tool_result,
+            )
 
         logger.info(
-            json.dumps(
-                {
-                    "event": "session_end",
-                    "session_id": sid,
-                    "user_id": user_id,
-                    "response_length": len(result_text),
-                }
-            )
+            json.dumps({
+                "event": "session_end",
+                "session_id": sid,
+                "user_id": user_id,
+                "adk_events": event_count,
+                "response_length": len(result_text),
+                "response_preview": result_text[:120],
+            })
         )
-        return result_text
+        return result_text, sid
     finally:
         if _use_xray:
             try:
@@ -218,13 +279,24 @@ try:
     app = BedrockAgentCoreApp()
 
     @app.entrypoint
-    async def agent_entrypoint(request) -> dict:
-        body = getattr(request, "body", {}) or {}
-        message = body.get("message", "")
-        session_id = body.get("session_id")
-        user_id = body.get("user_id", "anonymous")
-        response = await handle_session(message, session_id=session_id, user_id=user_id)
-        return {"response": response, "session_id": session_id}
+    async def agent_entrypoint(payload, context=None) -> dict:
+        # BedrockAgentCoreApp passes the request payload dict directly.
+        body = payload if isinstance(payload, dict) else {}
+        logger.info(
+            "Entrypoint received: body_type=%s body_keys=%s",
+            type(body).__name__,
+            list(body.keys()) if isinstance(body, dict) else repr(body)[:120],
+        )
+        # `agentcore invoke` sends {"prompt": ...}; custom clients may send {"message": ...}
+        message = body.get("message") or body.get("prompt") or ""
+        session_id = body.get("session_id") if isinstance(body, dict) else None
+        user_id = body.get("user_id", "anonymous") if isinstance(body, dict) else "anonymous"
+        logger.info(
+            "Parsed: message_length=%d session_id=%s user_id=%s",
+            len(message), session_id, user_id,
+        )
+        response, sid = await handle_session(message, session_id=session_id, user_id=user_id)
+        return {"response": response, "session_id": sid}
 
     if __name__ == "__main__":
         app.run()

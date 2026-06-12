@@ -24,6 +24,11 @@
             "3c0sjgi7urap4nr6e2jk39hu3b"
           ]
         }
+      },
+      "environmentVariables": {
+        "MEMORY_ID": "LapwiseF1Agent_LapwiseMemory-BpEoUO9hnK",
+        "COGNITO_CLIENT_A_SECRET_ARN": "arn:aws:secretsmanager:us-east-1:515819869309:secret:lapwise/agent/cognito-client-a-Nt217s",
+        "COGNITO_CLIENT_A_ID": "58imtktutg14oemj0kodh98puh"
       }
     }
   ],
