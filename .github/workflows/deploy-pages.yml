@@ -27,6 +27,7 @@ jobs:
         run: |
           mkdir -p _site
           cp lapwise-internal-demo.html _site/index.html
+          cp -r demo _site/demo
 
       - uses: actions/configure-pages@v5
 
