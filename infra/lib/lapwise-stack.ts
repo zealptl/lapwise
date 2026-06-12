@@ -1,6 +1,8 @@
+import { execSync } from 'child_process';
 import * as path from 'path';
 import * as cdk from 'aws-cdk-lib/core';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
@@ -31,14 +33,16 @@ export class LapwiseStack extends cdk.Stack {
       logGroup: lambdaLogGroup,
     });
 
-    // ── Cognito User Pool (task 4.3) ──────────────────────────────────────────
+    // ── Cognito User Pool (task 4.3, self sign-up for chat UI: task 2.1) ─────
     const userPool = new cognito.UserPool(this, 'LapwiseUserPool', {
       signInAliases: { email: true },
-      selfSignUpEnabled: false,
+      selfSignUpEnabled: true,
+      autoVerify: { email: true },
     });
 
     const userPoolClient = userPool.addClient('LapwiseAppClient', {
-      authFlows: { userPassword: true },
+      // userPassword kept for the CLI auth flow; userSrp added for the web UI
+      authFlows: { userPassword: true, userSrp: true },
     });
 
     // ── API Gateway access log group (task 4.8) ───────────────────────────────
@@ -63,9 +67,19 @@ export class LapwiseStack extends cdk.Stack {
     );
 
     // ── HTTP API — default authorizer covers all routes (tasks 4.4, 4.6) ─────
+    // corsPreflight lets the browser-based chat UI call the API (task 2.5)
     const api = new apigwv2.HttpApi(this, 'LapwiseApi', {
       defaultIntegration: new HttpLambdaIntegration('LambdaIntegration', fn),
       defaultAuthorizer: jwtAuthorizer,
+      corsPreflight: {
+        allowOrigins: ['http://localhost:5173'],
+        allowMethods: [
+          apigwv2.CorsHttpMethod.GET,
+          apigwv2.CorsHttpMethod.PUT,
+          apigwv2.CorsHttpMethod.OPTIONS,
+        ],
+        allowHeaders: ['Authorization', 'Content-Type'],
+      },
     });
 
     // ── Access logging on default stage (task 4.9) ────────────────────────────
@@ -106,6 +120,99 @@ export class LapwiseStack extends cdk.Stack {
       authorizer: new apigwv2.HttpNoneAuthorizer(),
     });
 
+    // ── Conversations table (task 2.2) ────────────────────────────────────────
+    const conversationTable = new dynamodb.Table(this, 'ConversationTable', {
+      partitionKey: { name: 'actor_id', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'session_id', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    // ── Conversations Lambda (task 2.3) ───────────────────────────────────────
+    const agentCoreMemoryId = 'LapwiseF1Agent_LapwiseMemory-BpEoUO9hnK';
+    const agentCoreMemoryArn = `arn:aws:bedrock-agentcore:${this.region}:${this.account}:memory/${agentCoreMemoryId}`;
+
+    const conversationsAssetDir = path.join(__dirname, '../lambda/conversations');
+    const conversationsFn = new lambda.Function(this, 'ConversationsFunction', {
+      runtime: lambda.Runtime.PYTHON_3_12,
+      handler: 'handler.handler',
+      // Bundle boto3 with the asset: the runtime's built-in boto3 may predate
+      // the bedrock-agentcore data plane client.
+      code: lambda.Code.fromAsset(conversationsAssetDir, {
+        exclude: ['.venv', '__pycache__', '.pytest_cache', 'tests', 'uv.lock', '.gitignore'],
+        bundling: {
+          image: lambda.Runtime.PYTHON_3_12.bundlingImage,
+          command: [
+            'bash',
+            '-c',
+            'pip install --target /asset-output "boto3>=1.39.15" && cp handler.py /asset-output/',
+          ],
+          local: {
+            tryBundle(outputDir: string): boolean {
+              execSync(
+                `uv pip install --quiet --python 3.12 --target "${outputDir}" "boto3>=1.39.15" && ` +
+                  `cp "${path.join(conversationsAssetDir, 'handler.py')}" "${outputDir}/"`,
+                { stdio: 'inherit', shell: '/bin/bash' },
+              );
+              return true;
+            },
+          },
+        },
+      }),
+      memorySize: 256,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        CONVERSATION_TABLE: conversationTable.tableName,
+        AGENTCORE_MEMORY_ID: agentCoreMemoryId,
+      },
+      logGroup: lambdaLogGroup,
+    });
+
+    // Scoped IAM: Query/PutItem on the table only, ListEvents on the memory only
+    conversationsFn.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['dynamodb:Query', 'dynamodb:PutItem'],
+        resources: [conversationTable.tableArn],
+      }),
+    );
+    conversationsFn.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['bedrock-agentcore:ListEvents'],
+        resources: [agentCoreMemoryArn],
+      }),
+    );
+
+    // ── Conversations routes — default JWT authorizer applies (task 2.4) ─────
+    const conversationsIntegration = new HttpLambdaIntegration(
+      'ConversationsIntegration',
+      conversationsFn,
+    );
+    api.addRoutes({
+      path: '/v1/conversations',
+      methods: [apigwv2.HttpMethod.GET],
+      integration: conversationsIntegration,
+    });
+    api.addRoutes({
+      path: '/v1/conversations/{sessionId}',
+      methods: [apigwv2.HttpMethod.PUT],
+      integration: conversationsIntegration,
+    });
+    api.addRoutes({
+      path: '/v1/conversations/{sessionId}/messages',
+      methods: [apigwv2.HttpMethod.GET],
+      integration: conversationsIntegration,
+    });
+
+    // CORS preflight must bypass the JWT authorizer: the $default route catches
+    // OPTIONS requests and would 401 them before API Gateway's automatic CORS
+    // response. AWS-documented fix: an unauthorized OPTIONS /{proxy+} route,
+    // which has higher priority than $default.
+    api.addRoutes({
+      path: '/{proxy+}',
+      methods: [apigwv2.HttpMethod.OPTIONS],
+      integration: conversationsIntegration,
+      authorizer: new apigwv2.HttpNoneAuthorizer(),
+    });
+
     // ── Stack outputs (task 4.10) ─────────────────────────────────────────────
     new cdk.CfnOutput(this, 'ApiUrl', {
       value: api.apiEndpoint,
@@ -118,6 +225,10 @@ export class LapwiseStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'AppClientId', {
       value: userPoolClient.userPoolClientId,
       description: 'Cognito App Client ID',
+    });
+    new cdk.CfnOutput(this, 'ConversationTableName', {
+      value: conversationTable.tableName,
+      description: 'DynamoDB conversations table name',
     });
   }
 }
