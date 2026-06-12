@@ -1,0 +1,12 @@
+[project]
+name = "conversations-lambda"
+version = "0.1.0"
+description = "Lapwise conversations API Lambda (list/rename conversations, replay AgentCore Memory messages)"
+requires-python = ">=3.12"
+dependencies = ["boto3>=1.39.15"]
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
