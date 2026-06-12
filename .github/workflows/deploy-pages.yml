@@ -29,6 +29,8 @@ jobs:
           cp lapwise-internal-demo.html _site/index.html
 
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
