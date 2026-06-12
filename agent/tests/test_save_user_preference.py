@@ -10,7 +10,7 @@ def _load_main(memory_id: str | None = None):
     if memory_id:
         env["MEMORY_ID"] = memory_id
     with patch.dict(os.environ, env, clear=True):
-        import agent.app.LapwiseF1Agent.main as mod
+        import main as mod
         importlib.reload(mod)
         return mod
 

@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 @pytest.mark.asyncio
 async def test_search_memory_returns_empty_when_no_memory_id():
-    from agent.app.LapwiseF1Agent.memory import AgentCoreMemoryService
+    from memory import AgentCoreMemoryService
 
     svc = AgentCoreMemoryService(memory_id=None)
     result = await svc.search_memory(app_name="test", user_id="user1", query="Monaco picks")
@@ -15,7 +15,7 @@ async def test_search_memory_returns_empty_when_no_memory_id():
 
 @pytest.mark.asyncio
 async def test_add_session_to_memory_noop_when_no_memory_id():
-    from agent.app.LapwiseF1Agent.memory import AgentCoreMemoryService
+    from memory import AgentCoreMemoryService
 
     svc = AgentCoreMemoryService(memory_id=None)
     session = MagicMock()
@@ -29,8 +29,8 @@ async def test_add_session_to_memory_calls_create_event():
     mock_client.get_memory_strategies.return_value = []
     mock_client.create_event = MagicMock()
 
-    with patch("agent.app.LapwiseF1Agent.memory.AgentCoreMemoryService.__init__") as mock_init:
-        from agent.app.LapwiseF1Agent.memory import AgentCoreMemoryService
+    with patch("memory.AgentCoreMemoryService.__init__") as mock_init:
+        from memory import AgentCoreMemoryService
 
         svc = AgentCoreMemoryService.__new__(AgentCoreMemoryService)
         svc._memory_id = "mem-123"
@@ -66,7 +66,7 @@ async def test_add_session_to_memory_skips_events_without_text():
     mock_client = MagicMock()
     mock_client.create_event = MagicMock()
 
-    from agent.app.LapwiseF1Agent.memory import AgentCoreMemoryService
+    from memory import AgentCoreMemoryService
 
     svc = AgentCoreMemoryService.__new__(AgentCoreMemoryService)
     svc._memory_id = "mem-456"

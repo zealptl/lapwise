@@ -13,7 +13,7 @@ def _make_cache(env: dict | None = None):
     clean_env = env or {}
     with patch.dict(os.environ, clean_env, clear=True):
         import importlib
-        import agent.app.LapwiseF1Agent.cognito as mod
+        import cognito as mod
 
         importlib.reload(mod)
         return mod.CognitoTokenCache()
@@ -43,10 +43,15 @@ def test_fetches_secret_once_at_cold_start():
     with patch.dict(os.environ, env, clear=True):
         with patch("boto3.client", return_value=mock_sm):
             import importlib
-            import agent.app.LapwiseF1Agent.cognito as mod
+            import cognito as mod
 
             importlib.reload(mod)
             cache = mod.CognitoTokenCache()
+            # Secret load is deferred to the first get_token() call (lazy cold start).
+            # Patch _refresh_token so we exercise the load path without a real HTTP call.
+            with patch.object(cache, "_refresh_token"):
+                cache.get_token()
+                cache.get_token()
 
     mock_sm.get_secret_value.assert_called_once_with(
         SecretId="arn:aws:secretsmanager:us-east-1:123:secret/test"
@@ -69,7 +74,7 @@ def test_token_is_cached_on_second_call():
     with patch.dict(os.environ, env, clear=True):
         with patch("boto3.client", return_value=mock_sm):
             import importlib
-            import agent.app.LapwiseF1Agent.cognito as mod
+            import cognito as mod
 
             importlib.reload(mod)
             cache = mod.CognitoTokenCache()
